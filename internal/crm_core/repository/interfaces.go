@@ -29,4 +29,19 @@ type (
 		SaveContact(ctx *gin.Context, newContact *entity.Contact) error
 		DeleteContact(ctx *gin.Context, id string, contact *entity.Contact) error
 	}
+	DealRepo interface {
+		GetDeals(ctx *gin.Context) (*[]entity.Deal, error)
+		GetDeal(ctx *gin.Context, id string) (*entity.Deal, error)
+		CreateDeal(ctx *gin.Context, deal *entity.Deal) error
+		SaveDeal(ctx *gin.Context, newDeal *entity.Deal) error
+		DeleteDeal(ctx *gin.Context, id string, deal *entity.Deal) error
+	}
+
+	TicketRepo interface {
+		GetTickets(ctx *gin.Context) (*[]entity.Ticket, error)
+		GetTicket(ctx *gin.Context, id string) (*entity.Ticket, error)
+		CreateTicket(ctx *gin.Context, ticket *entity.Ticket) error
+		SaveTicket(ctx *gin.Context, newTicket *entity.Ticket) error
+		DeleteTicket(ctx *gin.Context, id string, deal *entity.Ticket) error
+	}
 )

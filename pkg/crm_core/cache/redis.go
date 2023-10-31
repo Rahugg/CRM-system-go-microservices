@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"fmt"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -11,10 +12,12 @@ func NewRedisClient() (*redis.Client, error) {
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
-	err := client.Ping(context.Background()).Err()
-	if err != nil {
-		return nil, err
-	}
+	//err := client.Ping(context.Background()).Err()
+	//if err != nil {
+	//	return nil, err
+	//}
+
+	fmt.Println(client.Ping(context.Background()).Err())
 
 	return client, nil
 }

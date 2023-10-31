@@ -14,7 +14,7 @@ func Migrate(repo *repository.CRMSystemRepo, l *logger.Logger) {
 		&entityRepo.Contact{},
 		&entityRepo.Deal{},
 		&entityRepo.Task{},
-		&entityRepo.Task{},
+		&entityRepo.Ticket{},
 		&entityRepo.Role{},
 	)
 	if err != nil {

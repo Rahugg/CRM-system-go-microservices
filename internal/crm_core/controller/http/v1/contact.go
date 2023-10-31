@@ -60,7 +60,7 @@ func (cr *contactRoutes) getContact(ctx *gin.Context) {
 		contact, err = cr.s.GetContact(ctx, id)
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
-				Status:  -1,
+				Status:  -2,
 				Message: err.Error(),
 			})
 			return
@@ -73,7 +73,7 @@ func (cr *contactRoutes) getContact(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, &entity.CustomResponseWithData{
-		Status:  0,
+		Status:  -1,
 		Message: "OK",
 		Data:    contact,
 	})

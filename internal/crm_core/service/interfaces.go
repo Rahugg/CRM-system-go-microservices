@@ -29,4 +29,20 @@ type (
 		UpdateContact(ctx *gin.Context, newContact entity.Contact, id string) error
 		DeleteContact(ctx *gin.Context, id string) error
 	}
+
+	TicketService interface {
+		GetTickets(ctx *gin.Context) (*[]entity.Ticket, error)
+		GetTicket(ctx *gin.Context, id string) (*entity.Ticket, error)
+		CreateTicket(ctx *gin.Context, ticket entity.Ticket) error
+		UpdateTicket(ctx *gin.Context, newTicket entity.Ticket, id string) error
+		DeleteTicket(ctx *gin.Context, id string) error
+	}
+
+	DealService interface {
+		GetDeals(ctx *gin.Context) (*[]entity.Deal, error)
+		GetDeal(ctx *gin.Context, id string) (*entity.Deal, error)
+		CreateDeal(ctx *gin.Context, deal entity.Deal) error
+		UpdateDeal(ctx *gin.Context, newDeal entity.Deal, id string) error
+		DeleteDeal(ctx *gin.Context, id string) error
+	}
 )
