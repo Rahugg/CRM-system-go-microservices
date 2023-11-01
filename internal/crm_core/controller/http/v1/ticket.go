@@ -14,8 +14,8 @@ type ticketRoutes struct {
 	l *logger.Logger
 }
 
-func newTicketRoutes(handler *gin.RouterGroup, s *service.Service, l *logger.Logger, MW *middleware.Middleware) {
-	r := &ticketRoutes{s, l}
+func newTicketRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.Middleware) {
+	r := &ticketRoutes{s: s}
 
 	ticketHandler := handler.Group("/ticket")
 	{

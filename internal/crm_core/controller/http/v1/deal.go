@@ -14,8 +14,8 @@ type dealRoutes struct {
 	l *logger.Logger
 }
 
-func newDealRoutes(handler *gin.RouterGroup, s *service.Service, l *logger.Logger, MW *middleware.Middleware) {
-	r := &dealRoutes{s, l}
+func newDealRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.Middleware) {
+	r := &dealRoutes{s: s}
 
 	dealHandler := handler.Group("/deal")
 	{

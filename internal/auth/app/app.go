@@ -25,7 +25,7 @@ func Run(cfg *auth.Configuration) {
 	middleware := middleware2.New(repo, cfg)
 	handler := gin.Default()
 
-	v1.NewRouter(handler, service, l, middleware)
+	v1.NewRouter(handler, service, middleware)
 	httpServer := httpserver2.New(handler, cfg, httpserver2.Port(cfg.HTTP.Port))
 
 	// Waiting signal

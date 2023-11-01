@@ -35,7 +35,7 @@ func Run(cfg *crm_core.Configuration) {
 	middleware := middleware2.New(repo, cfg)
 	handler := gin.Default()
 
-	v1.NewRouter(handler, service, l, middleware, contactCache)
+	v1.NewRouter(handler, service, middleware, contactCache)
 	httpServer := httpserverPkg.New(handler, cfg, httpserverPkg.Port(cfg.HTTP.Port))
 
 	// Waiting signal

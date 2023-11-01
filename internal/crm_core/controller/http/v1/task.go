@@ -14,8 +14,8 @@ type taskRoutes struct {
 	l *logger.Logger
 }
 
-func newTaskRoutes(handler *gin.RouterGroup, s *service.Service, l *logger.Logger, MW *middleware.Middleware) {
-	r := &taskRoutes{s, l}
+func newTaskRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.Middleware) {
+	r := &taskRoutes{s: s}
 
 	taskHandler := handler.Group("/task")
 	{

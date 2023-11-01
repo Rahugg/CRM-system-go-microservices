@@ -17,8 +17,8 @@ type contactRoutes struct {
 	contactCache cache.Contact
 }
 
-func newContactRoutes(handler *gin.RouterGroup, s *service.Service, l *logger.Logger, MW *middleware.Middleware, cc cache.Contact) {
-	r := &contactRoutes{s, l, cc}
+func newContactRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.Middleware, cc cache.Contact) {
+	r := &contactRoutes{s: s, contactCache: cc}
 
 	contactHandler := handler.Group("/contact")
 	{

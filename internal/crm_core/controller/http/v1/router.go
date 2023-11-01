@@ -4,12 +4,11 @@ import (
 	"crm_system/internal/crm_core/controller/http/middleware"
 	"crm_system/internal/crm_core/service"
 	"crm_system/pkg/crm_core/cache"
-	"crm_system/pkg/crm_core/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-func NewRouter(handler *gin.Engine, s *service.Service, l *logger.Logger, MW *middleware.Middleware, cc cache.Contact) {
+func NewRouter(handler *gin.Engine, s *service.Service, MW *middleware.Middleware, cc cache.Contact) {
 
 	// Health Check
 	handler.GET("/health", func(c *gin.Context) {
@@ -20,11 +19,11 @@ func NewRouter(handler *gin.Engine, s *service.Service, l *logger.Logger, MW *mi
 
 	h := handler.Group("/v1")
 	{
-		newCompanyRoutes(h, s, l, MW)
-		newContactRoutes(h, s, l, MW, cc)
-		newDealRoutes(h, s, l, MW)
-		newTaskRoutes(h, s, l, MW)
-		newTicketRoutes(h, s, l, MW)
+		newCompanyRoutes(h, s, MW)
+		newContactRoutes(h, s, MW, cc)
+		newDealRoutes(h, s, MW)
+		newTaskRoutes(h, s, MW)
+		newTicketRoutes(h, s, MW)
 	}
 }
 

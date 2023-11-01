@@ -15,8 +15,8 @@ type userRoutes struct {
 	l *logger.Logger
 }
 
-func newUserRoutes(handler *gin.RouterGroup, s *service.Service, l *logger.Logger, MW *middleware.Middleware) {
-	r := &userRoutes{s, l}
+func newUserRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.Middleware) {
+	r := &userRoutes{s: s}
 
 	adminHandler := handler.Group("/admin/user")
 	{

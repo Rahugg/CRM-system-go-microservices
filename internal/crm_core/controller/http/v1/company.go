@@ -14,8 +14,8 @@ type companyRoutes struct {
 	l *logger.Logger
 }
 
-func newCompanyRoutes(handler *gin.RouterGroup, s *service.Service, l *logger.Logger, MW *middleware.Middleware) {
-	r := &companyRoutes{s, l}
+func newCompanyRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.Middleware) {
+	r := &companyRoutes{s: s}
 
 	companyHandler := handler.Group("/company")
 	{
