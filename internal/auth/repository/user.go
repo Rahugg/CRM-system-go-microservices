@@ -8,14 +8,14 @@ import (
 	"strings"
 )
 
-func (r *AuthRepo) GetUserByIdWithPreload(ctx *gin.Context, id string) (*entity.User, error) {
+func (r *AuthRepo) GetUserByIdWithPreload(id string) (*entity.User, error) {
 	var user entity.User
 	if err := r.DB.Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, errors.New("the user belonging to this token no logger exists")
 	}
 	return &user, nil
 }
-func (r *AuthRepo) GetUser(ctx *gin.Context, id string) (*entity.User, error) {
+func (r *AuthRepo) GetUser(id string) (*entity.User, error) {
 	var user entity.User
 	if err := r.DB.Where("id = ?", fmt.Sprint(id)).First(&user).Error; err != nil {
 		return nil, errors.New("the user belonging to this token no logger exists")

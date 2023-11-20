@@ -111,7 +111,7 @@ func (s *Service) GetUsers(ctx *gin.Context) (*[]entity2.User, error) {
 	return users, nil
 }
 func (s *Service) GetUser(ctx *gin.Context, id string) (*entity2.User, error) {
-	user, err := s.Repo.GetUser(ctx, id)
+	user, err := s.Repo.GetUser(id)
 
 	if err != nil {
 		return nil, err
@@ -127,7 +127,7 @@ func (s *Service) CreateUser(ctx *gin.Context, user *entity2.User) error {
 	return nil
 }
 func (s *Service) UpdateUser(ctx *gin.Context, newUser *entity2.User, id string) error {
-	user, err := s.Repo.GetUser(ctx, id)
+	user, err := s.Repo.GetUser(id)
 	if err != nil {
 		return err
 	}
@@ -172,7 +172,7 @@ func (s *Service) UpdateUser(ctx *gin.Context, newUser *entity2.User, id string)
 }
 
 func (s *Service) DeleteUser(ctx *gin.Context, id string) error {
-	user, err := s.Repo.GetUser(ctx, id)
+	user, err := s.Repo.GetUser(id)
 	if err != nil {
 		return err
 	}
