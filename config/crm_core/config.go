@@ -51,8 +51,8 @@ type (
 	}
 
 	Transport struct {
-		User     ValidateTransport     `yaml:"validate"`
-		UserGrpc ValidateGrpcTransport `yaml:"validateGrpc"`
+		Validate     ValidateTransport     `yaml:"validate"`
+		ValidateGrpc ValidateGrpcTransport `yaml:"validateGrpc"`
 	}
 
 	ValidateTransport struct {
@@ -65,15 +65,15 @@ type (
 	}
 
 	Jwt struct {
-		AccessPrivateKey     string `mapstructure:"access_private_key"`
-		AccessPublicKey      string `mapstructure:"access_public_key"`
-		AccessTokenExpiredIn int64  `mapstructure:"access_token_expired_in"`
-		accessTokenMaxAge    int64  `mapstructure:"access_token_max_age"`
+		AccessPrivateKey     string        `mapstructure:"access_private_key"`
+		AccessPublicKey      string        `mapstructure:"access_public_key"`
+		AccessTokenExpiredIn time.Duration `mapstructure:"access_token_expired_in"`
+		AccessTokenMaxAge    int64         `mapstructure:"access_token_max_age"`
 
-		RefreshPrivateKey     string `mapstructure:"refresh_private_key"`
-		RefreshPublicKey      string `mapstructure:"refresh_public_key"`
-		RefreshTokenExpiredIn int64  `mapstructure:"refresh_token_expired_in"`
-		refreshTokenMaxAge    int64  `mapstructure:"refresh_token_max_age"`
+		RefreshPrivateKey     string        `mapstructure:"refresh_private_key"`
+		RefreshPublicKey      string        `mapstructure:"refresh_public_key"`
+		RefreshTokenExpiredIn time.Duration `mapstructure:"refresh_token_expired_in"`
+		RefreshTokenMaxAge    int64         `mapstructure:"refresh_token_max_age"`
 	}
 )
 

@@ -9,24 +9,26 @@ import (
 	"crm_system/pkg/auth/utils"
 	"fmt"
 	"github.com/spf13/cast"
+	"log"
 )
 
-type AuthService struct {
+type Service struct {
 	pb.UnimplementedAuthServiceServer
 	logger *logger.Logger
 	repo   *repository.AuthRepo
 	config *auth.Configuration
 }
 
-func NewService(logger *logger.Logger, repo *repository.AuthRepo, config *auth.Configuration) *AuthService {
-	return &AuthService{
+func NewService(logger *logger.Logger, repo *repository.AuthRepo, config *auth.Configuration) *Service {
+	return &Service{
 		logger: logger,
 		repo:   repo,
 		config: config,
 	}
 }
 
-func (s *AuthService) Validate(ctx context.Context, request *pb.ValidateRequest) (*pb.ValidateResponse, error) {
+func (s *Service) Validate(ctx context.Context, request *pb.ValidateRequest) (*pb.ValidateResponse, error) {
+	log.Println(1)
 	sub, err := utils.ValidateToken(request.AccessToken, s.config.Jwt.AccessPrivateKey)
 	if err != nil {
 		s.logger.Error("failed to ValidateToken err %v", err)
@@ -40,7 +42,6 @@ func (s *AuthService) Validate(ctx context.Context, request *pb.ValidateRequest)
 	role, _ := s.repo.GetRoleById(user.RoleID)
 	for _, Role := range request.Roles {
 		if role.Name == Role || Role == "any" {
-			//response := &ResponseJSON{CurrentUser: user, CurrentRole: role}
 			response := &pb.ValidateResponse{
 				Response: &pb.ResponseJSON{
 					User: &pb.User{

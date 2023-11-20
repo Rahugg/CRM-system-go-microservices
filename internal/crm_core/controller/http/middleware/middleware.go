@@ -35,7 +35,7 @@ func (m *Middleware) CustomLogger() gin.HandlerFunc {
 	}
 }
 
-func (m *Middleware) DeserializeUser(roles []string) gin.HandlerFunc {
+func (m *Middleware) DeserializeUser(roles ...string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var accessToken string
 
@@ -56,8 +56,8 @@ func (m *Middleware) DeserializeUser(roles []string) gin.HandlerFunc {
 			})
 			return
 		}
-		resp, err := m.ValidateGrpcTransport.Validate(ctx, accessToken, roles)
 
+		resp, err := m.ValidateGrpcTransport.ValidateTransport(ctx.Request.Context(), accessToken, roles...)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, &entity.CustomResponse{
 				Status:  -1,

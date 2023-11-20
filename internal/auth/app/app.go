@@ -24,6 +24,7 @@ func Run(cfg *auth.Configuration) {
 	// Migrate the tables with gorm.Migrator
 	Migrate(repo, l)
 
+	fmt.Println(cfg)
 	service := servicePkg.New(cfg, repo, l)
 	middleware := middleware2.New(repo, cfg)
 	handler := gin.Default()

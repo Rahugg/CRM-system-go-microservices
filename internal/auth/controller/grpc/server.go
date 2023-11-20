@@ -10,13 +10,13 @@ import (
 
 type Server struct {
 	port       string
-	service    *AuthService
+	service    *Service
 	grpcServer *grpc.Server
 }
 
 func NewServer(
 	port string,
-	service *AuthService,
+	service *Service,
 ) *Server {
 	var opts []grpc.ServerOption
 

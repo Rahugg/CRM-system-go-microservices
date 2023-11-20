@@ -23,6 +23,7 @@ func Run(cfg *crm_core.Configuration) {
 	repo := repoPkg.New(cfg, l)
 	// migrate the tables with gorm.Migrator
 	Migrate(repo, l)
+	fmt.Println(cfg)
 
 	//REDIS implementation
 	redisClient, err := cache.NewRedisClient()

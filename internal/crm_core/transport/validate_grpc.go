@@ -16,7 +16,7 @@ type ValidateGrpcTransport struct {
 func NewValidateGrpcTransport(config crm_core.Configuration) *ValidateGrpcTransport {
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
-	conn, _ := grpc.Dial(config.Transport.UserGrpc.Host, opts...)
+	conn, _ := grpc.Dial(config.Transport.ValidateGrpc.Host, opts...)
 
 	client := pb.NewAuthServiceClient(conn)
 
@@ -26,12 +26,12 @@ func NewValidateGrpcTransport(config crm_core.Configuration) *ValidateGrpcTransp
 	}
 }
 
-func (t *ValidateGrpcTransport) Validate(ctx context.Context, accessToken string, roles []string) (*pb.ResponseJSON, error) {
+func (t *ValidateGrpcTransport) ValidateTransport(ctx context.Context, accessToken string, roles ...string) (*pb.ResponseJSON, error) {
+
 	resp, err := t.client.Validate(ctx, &pb.ValidateRequest{
 		AccessToken: accessToken,
 		Roles:       roles,
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("cannot Validate: %w", err)
 	}
