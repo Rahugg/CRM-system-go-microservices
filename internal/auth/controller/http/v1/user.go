@@ -40,6 +40,9 @@ func newUserRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 		userHandler.POST("/register", r.signUpManager)
 		userHandler.POST("/login", r.signIn)
 		userHandler.GET("/logout", r.logout)
+
+		userHandler.GET("/me", MW.DeserializeUser("admin,manager,sales_rep,support_rep"), r.getMe)
+		userHandler.PUT("/me", MW.DeserializeUser("admin,manager,sales_rep,support_rep"), r.updateMe)
 	}
 }
 
@@ -205,6 +208,47 @@ func (ur *userRoutes) createUser(ctx *gin.Context) {
 			Message: err.Error(),
 		})
 		return
+	}
+
+	ctx.JSON(http.StatusOK, &entity.CustomResponse{
+		Status:  0,
+		Message: "OK",
+	})
+}
+
+func (ur *userRoutes) getMe(ctx *gin.Context) {
+	user, err := ur.s.GetMe(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
+			Status:  -1,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, &entity.CustomResponseWithData{
+		Status:  0,
+		Message: "OK",
+		Data:    user,
+	})
+}
+
+func (ur *userRoutes) updateMe(ctx *gin.Context) {
+	var newUser *entity.User
+
+	if err := ctx.ShouldBindJSON(&newUser); err != nil {
+		ctx.JSON(http.StatusBadRequest, &entity.CustomResponse{
+			Status:  -1,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	if err := ur.s.UpdateMe(ctx, newUser); err != nil {
+		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
+			Status:  -2,
+			Message: err.Error(),
+		})
 	}
 
 	ctx.JSON(http.StatusOK, &entity.CustomResponse{

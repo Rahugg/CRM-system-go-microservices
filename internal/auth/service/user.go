@@ -4,6 +4,7 @@ import (
 	entity2 "crm_system/internal/auth/entity"
 	"crm_system/pkg/auth/utils"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"strings"
 	"time"
@@ -177,6 +178,57 @@ func (s *Service) DeleteUser(ctx *gin.Context, id string) error {
 	}
 
 	if err = s.Repo.DeleteUser(ctx, id, user); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Service) GetMe(ctx *gin.Context) (interface{}, error) {
+	user, exist := ctx.MustGet("currentUser").(*entity2.User)
+	if !exist {
+		return nil, fmt.Errorf("the current user did not authorize or does not exist")
+	}
+
+	return user, nil
+}
+
+func (s *Service) UpdateMe(ctx *gin.Context, newUser *entity2.User) error {
+	user := ctx.MustGet("currentUser").(*entity2.User)
+
+	if newUser.FirstName != "" {
+		user.FirstName = newUser.FirstName
+	}
+
+	if newUser.LastName != "" {
+		user.LastName = newUser.LastName
+	}
+
+	if newUser.Age != 0 {
+		user.Age = newUser.Age
+	}
+
+	if newUser.Phone != "" {
+		user.Phone = newUser.Phone
+	}
+
+	if newUser.RoleID != 0 {
+		user.RoleID = newUser.RoleID
+	}
+
+	if newUser.Email != "" {
+		user.Email = newUser.Email
+	}
+
+	if newUser.Provider != "" {
+		user.Provider = newUser.Provider
+	}
+
+	if newUser.Password != "" {
+		user.Password = newUser.Password
+	}
+
+	if err := s.Repo.SaveUser(ctx, user); err != nil {
 		return err
 	}
 
