@@ -3,18 +3,19 @@ package crm_core
 import (
 	"github.com/spf13/viper"
 	"log"
+	"time"
 )
 
 type (
 	// Configuration -.
 	Configuration struct {
-		App  `yaml:"app"`
-		HTTP `yaml:"http"`
-		Log  `yaml:"logger"`
-		Gin  `yaml:"gin"`
-		DB   `yaml:"db"`
-		//Auth `yaml:"auth"`
-		Jwt `yaml:"jwt"`
+		App       `yaml:"app"`
+		HTTP      `yaml:"http"`
+		Log       `yaml:"logger"`
+		Gin       `yaml:"gin"`
+		DB        `yaml:"db"`
+		Transport `yaml:"transport"`
+		Jwt       `yaml:"jwt"`
 	}
 
 	// App -.
@@ -49,10 +50,19 @@ type (
 		Port     int64  `env-required:"true" yaml:"port" env:"DB_PORT"`
 	}
 
-	//Auth struct {
-	//	Login    string `mapstructure:"login"`
-	//	Password string `mapstructure:"pass"`
-	//}
+	Transport struct {
+		User     ValidateTransport     `yaml:"validate"`
+		UserGrpc ValidateGrpcTransport `yaml:"validateGrpc"`
+	}
+
+	ValidateTransport struct {
+		Host    string        `yaml:"host"`
+		Timeout time.Duration `yaml:"timeout"`
+	}
+
+	ValidateGrpcTransport struct {
+		Host string `yaml:"host"`
+	}
 
 	Jwt struct {
 		AccessPrivateKey     string `mapstructure:"access_private_key"`

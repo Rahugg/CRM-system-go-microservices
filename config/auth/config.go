@@ -3,20 +3,18 @@ package auth
 import (
 	"github.com/spf13/viper"
 	"log"
-	"time"
 )
 
 type (
 	// Configuration -.
 	Configuration struct {
-		App       `yaml:"app"`
-		HTTP      `yaml:"http"`
-		Grpc      `yaml:"Grpc"`
-		Log       `yaml:"logger"`
-		Gin       `yaml:"gin"`
-		DB        `yaml:"db"`
-		Transport `yaml:"transport"`
-		Jwt       `yaml:"jwt"`
+		App  `yaml:"app"`
+		HTTP `yaml:"http"`
+		Grpc `yaml:"Grpc"`
+		Log  `yaml:"logger"`
+		Gin  `yaml:"gin"`
+		DB   `yaml:"db"`
+		Jwt  `yaml:"jwt"`
 	}
 
 	// App -.
@@ -49,15 +47,6 @@ type (
 		Password string `env-required:"true" yaml:"password" env:"DB_PASSWORD"`
 		Name     string `env-required:"true" yaml:"name" env:"DB_NAME"`
 		Port     int64  `env-required:"true" yaml:"port" env:"DB_PORT"`
-	}
-
-	Transport struct {
-		Validate ValidateTransport `yaml:"validate"`
-	}
-
-	ValidateTransport struct {
-		Host    string        `yaml:"host"`
-		Timeout time.Duration `yaml:"timeout"`
 	}
 
 	Grpc struct {
