@@ -38,9 +38,17 @@ func (s *Service) UpdateCompany(ctx *gin.Context, newCompany entity.NewCompany, 
 		return err
 	}
 
-	company.Name = newCompany.Name
-	company.Address = newCompany.Address
-	company.Phone = newCompany.Phone
+	if newCompany.Name != "" {
+		company.Name = newCompany.Name
+	}
+
+	if newCompany.Address != "" {
+		company.Address = newCompany.Address
+	}
+
+	if newCompany.Phone != "" {
+		company.Phone = newCompany.Phone
+	}
 
 	if err = s.Repo.SaveCompany(ctx, company); err != nil {
 		return err

@@ -3,6 +3,7 @@ package service
 import (
 	"crm_system/internal/crm_core/entity"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func (s *Service) GetTickets(ctx *gin.Context) (*[]entity.Ticket, error) {
@@ -35,10 +36,21 @@ func (s *Service) UpdateTicket(ctx *gin.Context, newTicket entity.Ticket, id str
 		return err
 	}
 
-	ticket.IssueDescription = newTicket.IssueDescription
-	ticket.Status = newTicket.Status
-	ticket.ContactID = newTicket.ContactID
-	ticket.AssignedTo = newTicket.AssignedTo
+	if newTicket.IssueDescription != "" {
+		ticket.IssueDescription = newTicket.IssueDescription
+	}
+
+	if isValidTicketStatus(newTicket.Status) {
+		ticket.Status = newTicket.Status
+	}
+
+	if newTicket.ContactID != 0 {
+		ticket.ContactID = newTicket.ContactID
+	}
+
+	if newTicket.AssignedTo != uuid.Nil {
+		ticket.AssignedTo = newTicket.AssignedTo
+	}
 
 	if err = s.Repo.SaveTicket(ctx, ticket); err != nil {
 		return err
@@ -46,6 +58,16 @@ func (s *Service) UpdateTicket(ctx *gin.Context, newTicket entity.Ticket, id str
 
 	return nil
 }
+
+func isValidTicketStatus(status entity.StatusTicket) bool {
+	switch status {
+	case entity.Open, entity.InProgressTicket, entity.Closed:
+		return true
+	default:
+		return false
+	}
+}
+
 func (s *Service) DeleteTicket(ctx *gin.Context, id string) error {
 	ticket, err := s.Repo.GetTicket(ctx, id)
 	if err != nil {

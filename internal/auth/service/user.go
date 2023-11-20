@@ -36,11 +36,11 @@ func (s *Service) SignUp(ctx *gin.Context, payload *entity2.SignUpInput, roleId 
 		Provider:  provider,
 	}
 
-	if err = s.Repo.CreateUser(&user); err != nil {
+	if err = s.Repo.CreateUser(ctx, &user); err != nil {
 		return nil, err
 	}
 
-	result, err := s.returnUsers(user.RoleID)
+	result, err := s.returnUsers(ctx, user.RoleID)
 	if err != nil {
 		return nil, err
 	}
@@ -48,8 +48,8 @@ func (s *Service) SignUp(ctx *gin.Context, payload *entity2.SignUpInput, roleId 
 	return &result, nil
 }
 
-func (s *Service) SignIn(payload *entity2.SignInInput) (*entity2.SignInResult, error) {
-	user, err := s.Repo.GetUserByEmail(payload.Email)
+func (s *Service) SignIn(ctx *gin.Context, payload *entity2.SignInInput) (*entity2.SignInResult, error) {
+	user, err := s.Repo.GetUserByEmail(ctx, payload.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -69,17 +69,17 @@ func (s *Service) SignIn(payload *entity2.SignInInput) (*entity2.SignInResult, e
 	}
 
 	data := entity2.SignInResult{
-		Role:         user.Role.Name,
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-		//AccessTokenAge:  int(s.Config.Jwt.AccessTokenMaxAge * 60),
-		//RefreshTokenAge: int(s.Config.Jwt.RefreshTokenMaxAge * 60),
+		Role:            user.Role.Name,
+		AccessToken:     accessToken,
+		RefreshToken:    refreshToken,
+		AccessTokenAge:  int(s.Config.Jwt.AccessTokenMaxAge * 60),
+		RefreshTokenAge: int(s.Config.Jwt.RefreshTokenMaxAge * 60),
 	}
 	return &data, nil
 }
 
-func (s *Service) returnUsers(roleId uint) (*[]entity2.SignUpResult, error) {
-	users, err := s.Repo.GetUsersByRole(roleId)
+func (s *Service) returnUsers(ctx *gin.Context, roleId uint) (*[]entity2.SignUpResult, error) {
+	users, err := s.Repo.GetUsersByRole(ctx, roleId)
 	if err != nil {
 		return nil, err
 	}
@@ -99,4 +99,86 @@ func (s *Service) returnUsers(roleId uint) (*[]entity2.SignUpResult, error) {
 		}
 	}
 	return &result, nil
+}
+
+func (s *Service) GetUsers(ctx *gin.Context) (*[]entity2.User, error) {
+	users, err := s.Repo.GetUsers(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+func (s *Service) GetUser(ctx *gin.Context, id string) (*entity2.User, error) {
+	user, err := s.Repo.GetUser(ctx, id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+func (s *Service) CreateUser(ctx *gin.Context, user *entity2.User) error {
+	if err := s.Repo.CreateUser(ctx, user); err != nil {
+		return err
+	}
+
+	return nil
+}
+func (s *Service) UpdateUser(ctx *gin.Context, newUser *entity2.User, id string) error {
+	user, err := s.Repo.GetUser(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	if newUser.FirstName != "" {
+		user.FirstName = newUser.FirstName
+	}
+
+	if newUser.LastName != "" {
+		user.LastName = newUser.LastName
+	}
+
+	if newUser.Age != 0 {
+		user.Age = newUser.Age
+	}
+
+	if newUser.Phone != "" {
+		user.Phone = newUser.Phone
+	}
+
+	if newUser.RoleID != 0 {
+		user.RoleID = newUser.RoleID
+	}
+
+	if newUser.Email != "" {
+		user.Email = newUser.Email
+	}
+
+	if newUser.Provider != "" {
+		user.Provider = newUser.Provider
+	}
+
+	if newUser.Password != "" {
+		user.Password = newUser.Password
+	}
+
+	if err = s.Repo.SaveUser(ctx, user); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Service) DeleteUser(ctx *gin.Context, id string) error {
+	user, err := s.Repo.GetUser(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	if err = s.Repo.DeleteUser(ctx, id, user); err != nil {
+		return err
+	}
+
+	return nil
 }

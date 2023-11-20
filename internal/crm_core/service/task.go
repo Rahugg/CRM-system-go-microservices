@@ -3,6 +3,7 @@ package service
 import (
 	"crm_system/internal/crm_core/entity"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func (s *Service) GetTasks(ctx *gin.Context) (*[]entity.Task, error) {
@@ -38,10 +39,21 @@ func (s *Service) UpdateTask(ctx *gin.Context, newTask entity.Task, id string) e
 		return err
 	}
 
-	task.Description = newTask.Description
-	task.DueDate = newTask.DueDate
-	task.AssignedTo = newTask.AssignedTo
-	task.AssociatedDealID = newTask.AssociatedDealID
+	if newTask.Description != "" {
+		task.Description = newTask.Description
+	}
+
+	if !newTask.DueDate.IsZero() {
+		task.DueDate = newTask.DueDate
+	}
+
+	if newTask.AssignedTo != uuid.Nil {
+		task.AssignedTo = newTask.AssignedTo
+	}
+
+	if newTask.AssociatedDealID != 0 {
+		task.AssociatedDealID = newTask.AssociatedDealID
+	}
 
 	if err = s.Repo.SaveTask(ctx, task); err != nil {
 		return err

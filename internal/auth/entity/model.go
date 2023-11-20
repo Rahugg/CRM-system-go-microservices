@@ -19,11 +19,11 @@ type SignInInput struct {
 }
 
 type SignInResult struct {
-	Role         string `json:"role"`
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-	//AccessTokenAge  int    `json:"access_token_age"`
-	//RefreshTokenAge int    `json:"refresh_token_age"`
+	Role            string `json:"role"`
+	AccessToken     string `json:"access_token"`
+	RefreshToken    string `json:"refresh_token"`
+	AccessTokenAge  int    `json:"access_token_age"`
+	RefreshTokenAge int    `json:"refresh_token_age"`
 }
 
 type SignUpResult struct {

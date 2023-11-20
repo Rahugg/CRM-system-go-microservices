@@ -2,8 +2,6 @@ package entity
 
 import "gorm.io/gorm"
 
-//Clients
-
 type Contact struct {
 	gorm.Model
 	FirstName string `gorm:"varchar(255);not null" json:"first_name"`

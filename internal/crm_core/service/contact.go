@@ -35,11 +35,27 @@ func (s *Service) UpdateContact(ctx *gin.Context, newContact entity.Contact, id 
 		return err
 	}
 
-	contact.FirstName = newContact.FirstName
-	contact.LastName = newContact.LastName
-	contact.Phone = newContact.Phone
-	contact.Email = newContact.Email
-	contact.CompanyID = newContact.CompanyID
+	if newContact.FirstName != "" {
+		contact.FirstName = newContact.FirstName
+	}
+
+	if newContact.LastName != "" {
+		contact.LastName = newContact.LastName
+	}
+
+	if newContact.Phone != "" {
+		contact.Phone = newContact.Phone
+	}
+
+	if newContact.Email != "" {
+		contact.Email = newContact.Email
+	}
+
+	if newContact.CompanyID != 0 {
+		contact.CompanyID = newContact.CompanyID
+	} else {
+		contact.CompanyID = 0
+	}
 
 	if err = s.Repo.SaveContact(ctx, contact); err != nil {
 		return err
@@ -47,6 +63,7 @@ func (s *Service) UpdateContact(ctx *gin.Context, newContact entity.Contact, id 
 
 	return nil
 }
+
 func (s *Service) DeleteContact(ctx *gin.Context, id string) error {
 	contact, err := s.Repo.GetContact(ctx, id)
 	if err != nil {

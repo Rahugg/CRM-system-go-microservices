@@ -36,11 +36,25 @@ func (s *Service) UpdateDeal(ctx *gin.Context, newDeal entity.Deal, id string) e
 		return err
 	}
 
-	deal.Title = newDeal.Title
-	deal.Value = newDeal.Value
-	deal.Status = newDeal.Status
-	deal.ContactID = newDeal.ContactID
-	deal.RepID = newDeal.RepID
+	if newDeal.Title != "" {
+		deal.Title = newDeal.Title
+	}
+
+	if newDeal.Value != 0 {
+		deal.Value = newDeal.Value
+	}
+
+	if isValidDealStatus(newDeal.Status) {
+		deal.Status = newDeal.Status
+	}
+
+	if newDeal.ContactID != 0 {
+		deal.ContactID = newDeal.ContactID
+	}
+
+	if newDeal.RepID != 0 {
+		deal.RepID = newDeal.RepID
+	}
 
 	if err = s.Repo.SaveDeal(ctx, deal); err != nil {
 		return err
@@ -48,6 +62,15 @@ func (s *Service) UpdateDeal(ctx *gin.Context, newDeal entity.Deal, id string) e
 
 	return nil
 }
+func isValidDealStatus(status entity.StatusDeal) bool {
+	switch status {
+	case entity.Initiated, entity.InProgress, entity.ClosedWon, entity.ClosedLost:
+		return true
+	default:
+		return false
+	}
+}
+
 func (s *Service) DeleteDeal(ctx *gin.Context, id string) error {
 	deal, err := s.Repo.GetDeal(ctx, id)
 	if err != nil {
