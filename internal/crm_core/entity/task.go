@@ -8,7 +8,7 @@ import (
 
 type Task struct {
 	gorm.Model
-	Name             string    `json:"name" gorm:"not null"`
+	Name             string    `json:"name" gorm:"varchar(255);not null"`
 	Description      string    `gorm:"varchar(255);not null" json:"description"`
 	DueDate          time.Time `json:"due_date"`
 	AssignedTo       uuid.UUID `json:"assigned_to"`

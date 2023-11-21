@@ -30,7 +30,6 @@ func (s *Service) GetTasks(ctx *gin.Context, dealId string, user *entity.User) (
 	}
 
 	dashboardTodos = appendTasks(tasks, user, dashboardTodos)
-
 	var columns []map[string]interface{}
 	for _, state := range stateTypes {
 		column := map[string]interface{}{

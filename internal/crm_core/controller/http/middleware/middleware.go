@@ -6,6 +6,8 @@ import (
 	"crm_system/internal/crm_core/repository"
 	"crm_system/internal/crm_core/transport"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"log"
 	"net/http"
 	"strings"
@@ -65,7 +67,20 @@ func (m *Middleware) DeserializeUser(roles ...string) gin.HandlerFunc {
 			})
 			return
 		}
-		ctx.Set("currentUser", resp.User)
+		user := &entity.User{
+			Model:     gorm.Model{},
+			ID:        uuid.UUID{},
+			FirstName: resp.User.FirstName,
+			LastName:  resp.User.LastName,
+			Age:       uint64(resp.User.Age),
+			Phone:     resp.User.Phone,
+			RoleID:    uint(resp.User.RoleID),
+			Role:      entity.Role{},
+			Email:     resp.User.Email,
+			Provider:  resp.User.Provider,
+			Password:  resp.User.Password,
+		}
+		ctx.Set("currentUser", user)
 		ctx.Set("currentRole", resp.Role)
 		ctx.Next()
 

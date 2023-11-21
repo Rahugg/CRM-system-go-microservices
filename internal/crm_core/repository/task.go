@@ -4,6 +4,7 @@ import (
 	"crm_system/internal/crm_core/entity"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func (r *CRMSystemRepo) GetTasks(ctx *gin.Context) (*[]entity.Task, error) {
@@ -25,15 +26,24 @@ func (r *CRMSystemRepo) GetTask(ctx *gin.Context, id string) (*entity.Task, erro
 
 	return task, nil
 }
-func (r *CRMSystemRepo) GetTasksByDealId(orgId string) ([]entity.Task, error) {
+func (r *CRMSystemRepo) GetTasksByDealId(dealId string) ([]entity.Task, error) {
 	var tasks []entity.Task
-	if err := r.DB.Preload("Votes").Where("organization_id = ?", orgId).Find(&tasks).Error; err != nil {
+	if err := r.DB.Preload("Votes").Where("associated_deal_id = ?", dealId).Find(&tasks).Error; err != nil {
 		return nil, err
 	}
 	return tasks, nil
 }
 
-func (r *CRMSystemRepo) CreateTask(ctx *gin.Context, task *entity.TaskInput) error {
+func (r *CRMSystemRepo) CreateTask(ctx *gin.Context, newTask *entity.TaskInput) error {
+	task := &entity.Task{
+		Model:            gorm.Model{},
+		Name:             newTask.Name,
+		Description:      newTask.Description,
+		DueDate:          newTask.DueDate,
+		AssignedTo:       newTask.AssignedTo,
+		AssociatedDealID: newTask.AssociatedDealID,
+		State:            newTask.State,
+	}
 	if err := r.DB.Create(&task).Error; err != nil {
 		return err
 	}

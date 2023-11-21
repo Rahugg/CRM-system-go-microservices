@@ -5,6 +5,7 @@ import (
 	"crm_system/internal/crm_core/entity"
 	"crm_system/internal/crm_core/service"
 	"crm_system/pkg/crm_core/logger"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -20,7 +21,7 @@ func newTaskRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 	taskHandler := handler.Group("/task")
 	{
 		//middleware for users
-		taskHandler.GET("/", MW.DeserializeUser("any"), r.getTasks)
+		taskHandler.GET("/deal/:dealId", MW.DeserializeUser("any"), r.getTasks)
 		taskHandler.GET("/:id", MW.DeserializeUser("any"), r.getTask)
 		taskHandler.POST("/", MW.DeserializeUser("manager"), r.createTask)
 		taskHandler.POST("/vote", MW.DeserializeUser("any"), r.vote)
@@ -32,12 +33,20 @@ func newTaskRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 
 func (tr *taskRoutes) getTasks(ctx *gin.Context) {
 	dealId := ctx.Param("dealId")
-	user := ctx.MustGet("currentUser").(*entity.User)
+	user, exists := ctx.MustGet("currentUser").(*entity.User)
+	if !exists {
+		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
+			Status:  -1,
+			Message: fmt.Errorf("the current user did not authorize or does not exist").Error(),
+		})
+		return
+	}
+
 	tasks, err := tr.s.GetTasks(ctx, dealId, user)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
-			Status:  -1,
+			Status:  -2,
 			Message: err.Error(),
 		})
 		return
