@@ -15,7 +15,7 @@ type (
 	}
 
 	TaskService interface {
-		GetTasks(ctx *gin.Context) (*[]entity.Task, error)
+		GetTasks(ctx *gin.Context, dealId string, user entity.User) ([]map[string]interface{}, error)
 		GetTask(ctx *gin.Context, id string) (*entity.Task, error)
 		CreateTask(ctx *gin.Context, task entity.Task) error
 		UpdateTask(ctx *gin.Context, newTask entity.Task, id string) error

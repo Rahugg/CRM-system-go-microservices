@@ -26,12 +26,14 @@ func newTaskRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 		taskHandler.POST("/vote", MW.DeserializeUser("any"), r.vote)
 		taskHandler.PUT("/:id", MW.DeserializeUser("manager"), r.updateTask)
 		taskHandler.DELETE("/:id", MW.DeserializeUser("manager"), r.deleteTask)
-		taskHandler.GET("/changes/:id", MW.DeserializeUser("manager"), r.getChangesOfTodo)
+		taskHandler.GET("/changes/:id", MW.DeserializeUser("manager"), r.getChangesOfTask)
 	}
 }
 
 func (tr *taskRoutes) getTasks(ctx *gin.Context) {
-	tasks, err := tr.s.GetTasks(ctx)
+	dealId := ctx.Param("dealId")
+	user := ctx.MustGet("currentUser").(*entity.User)
+	tasks, err := tr.s.GetTasks(ctx, dealId, user)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
@@ -77,7 +79,7 @@ func (tr *taskRoutes) createTask(ctx *gin.Context) {
 		return
 	}
 
-	if err := tr.s.CreateTask(ctx, task); err != nil {
+	if err := tr.s.CreateTask(ctx, &task); err != nil {
 		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
 			Status:  -2,
 			Message: err.Error(),
@@ -91,10 +93,35 @@ func (tr *taskRoutes) createTask(ctx *gin.Context) {
 	})
 }
 
-func (tr *taskRoutes) vote(ctx *gin.Context) {}
+func (tr *taskRoutes) vote(ctx *gin.Context) {
+	user := ctx.MustGet("currentUser").(*entity.User)
+	var voteInput *entity.VoteInput
+	if err := ctx.ShouldBindJSON(&voteInput); err != nil {
+		ctx.JSON(http.StatusBadRequest, &entity.CustomResponse{
+			Status:  -1,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	err := tr.s.Vote(ctx, user, voteInput)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, &entity.CustomResponse{
+			Status:  -2,
+			Message: err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, &entity.CustomResponse{
+		Status:  0,
+		Message: "OK",
+	})
+
+}
 
 func (tr *taskRoutes) updateTask(ctx *gin.Context) {
 	id := ctx.Param("id")
+	user := ctx.MustGet("currentUser").(*entity.User)
 
 	var task entity.TaskEditInput
 
@@ -106,7 +133,7 @@ func (tr *taskRoutes) updateTask(ctx *gin.Context) {
 		return
 	}
 
-	if err := tr.s.UpdateTask(ctx, task, id); err != nil {
+	if err := tr.s.UpdateTask(ctx, task, id, user); err != nil {
 		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
 			Status:  -2,
 			Message: err.Error(),
@@ -136,6 +163,21 @@ func (tr *taskRoutes) deleteTask(ctx *gin.Context) {
 	})
 }
 
-func (tr *taskRoutes) getChangesOfTodo(ctx *gin.Context) {
+func (tr *taskRoutes) getChangesOfTask(ctx *gin.Context) {
+	id := ctx.Param("id")
+	todoChanges, err := tr.s.GetChangesOfTask(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, &entity.CustomResponse{
+			Status:  -1,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, &entity.CustomResponseWithData{
+		Status:  0,
+		Message: "OK",
+		Data:    todoChanges,
+	})
 
 }

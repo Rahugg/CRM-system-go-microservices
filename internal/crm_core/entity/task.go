@@ -17,7 +17,7 @@ type Task struct {
 	Votes            []Vote    `json:"votes"`
 }
 type TaskResult struct {
-	Todo      Task `json:"task"`
+	Task      Task `json:"task"`
 	VoteCount int  `json:"vote_count"`
 	UserVoted bool `json:"user_voted"`
 }
@@ -40,7 +40,7 @@ type TaskEditInput struct {
 	State            string    `json:"state"`
 }
 
-type TodoChanges struct {
+type TaskChanges struct {
 	gorm.Model
 	ID           uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
 	ManagerID    uuid.UUID `json:"manager_id" gorm:"not null"`
