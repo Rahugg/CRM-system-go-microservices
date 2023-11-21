@@ -25,7 +25,7 @@ func (r *CRMSystemRepo) GetTask(ctx *gin.Context, id string) (*entity.Task, erro
 	return task, nil
 }
 
-func (r *CRMSystemRepo) CreateTask(ctx *gin.Context, task *entity.Task) error {
+func (r *CRMSystemRepo) CreateTask(ctx *gin.Context, task *entity.TaskInput) error {
 	if err := r.DB.Create(&task).Error; err != nil {
 		return err
 	}

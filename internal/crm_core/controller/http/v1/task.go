@@ -20,11 +20,13 @@ func newTaskRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 	taskHandler := handler.Group("/task")
 	{
 		//middleware for users
-		taskHandler.GET("/", r.getTasks)
-		taskHandler.GET("/:id", r.getTask)
-		taskHandler.POST("/", r.createTask)
-		taskHandler.PUT("/:id", r.updateTask)
-		taskHandler.DELETE("/:id", r.deleteTask)
+		taskHandler.GET("/", MW.DeserializeUser("any"), r.getTasks)
+		taskHandler.GET("/:id", MW.DeserializeUser("any"), r.getTask)
+		taskHandler.POST("/", MW.DeserializeUser("manager"), r.createTask)
+		taskHandler.POST("/vote", MW.DeserializeUser("any"), r.vote)
+		taskHandler.PUT("/:id", MW.DeserializeUser("manager"), r.updateTask)
+		taskHandler.DELETE("/:id", MW.DeserializeUser("manager"), r.deleteTask)
+		taskHandler.GET("/changes/:id", MW.DeserializeUser("manager"), r.getChangesOfTodo)
 	}
 }
 
@@ -65,7 +67,7 @@ func (tr *taskRoutes) getTask(ctx *gin.Context) {
 	})
 }
 func (tr *taskRoutes) createTask(ctx *gin.Context) {
-	var task entity.Task
+	var task entity.TaskInput
 
 	if err := ctx.ShouldBindJSON(&task); err != nil {
 		ctx.JSON(http.StatusBadRequest, &entity.CustomResponse{
@@ -88,10 +90,13 @@ func (tr *taskRoutes) createTask(ctx *gin.Context) {
 		Message: "OK",
 	})
 }
+
+func (tr *taskRoutes) vote(ctx *gin.Context) {}
+
 func (tr *taskRoutes) updateTask(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	var task entity.Task
+	var task entity.TaskEditInput
 
 	if err := ctx.ShouldBindJSON(&task); err != nil {
 		ctx.JSON(http.StatusBadRequest, &entity.CustomResponse{
@@ -129,4 +134,8 @@ func (tr *taskRoutes) deleteTask(ctx *gin.Context) {
 		Status:  0,
 		Message: "OK",
 	})
+}
+
+func (tr *taskRoutes) getChangesOfTodo(ctx *gin.Context) {
+
 }

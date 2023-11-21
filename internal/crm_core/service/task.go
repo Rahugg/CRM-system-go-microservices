@@ -25,7 +25,7 @@ func (s *Service) GetTask(ctx *gin.Context, id string) (*entity.Task, error) {
 	return task, nil
 }
 
-func (s *Service) CreateTask(ctx *gin.Context, task entity.Task) error {
+func (s *Service) CreateTask(ctx *gin.Context, task entity.TaskInput) error {
 	if err := s.Repo.CreateTask(ctx, &task); err != nil {
 		return err
 	}
@@ -33,12 +33,15 @@ func (s *Service) CreateTask(ctx *gin.Context, task entity.Task) error {
 	return nil
 }
 
-func (s *Service) UpdateTask(ctx *gin.Context, newTask entity.Task, id string) error {
+func (s *Service) UpdateTask(ctx *gin.Context, newTask entity.TaskEditInput, id string) error {
 	task, err := s.Repo.GetTask(ctx, id)
 	if err != nil {
 		return err
 	}
 
+	if newTask.Name != "" {
+		task.Name = newTask.Name
+	}
 	if newTask.Description != "" {
 		task.Description = newTask.Description
 	}

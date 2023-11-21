@@ -23,6 +23,7 @@ func newUserRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 		adminHandler.Use(MW.CustomLogger())
 		adminHandler.Use(MW.DeserializeUser("admin"))
 
+		adminHandler.POST("/register", r.signUpAdmin)
 		adminHandler.GET("/", r.getUsers)
 		adminHandler.GET("/:id", r.getUser)
 		adminHandler.PUT("/:id", r.updateUser)
@@ -50,9 +51,22 @@ func (ur *userRoutes) signUpAdmin(ctx *gin.Context) {
 	ur.signUp(ctx, 1, true, "admin")
 }
 
+// TODO: change the verified to an email with kafka
 func (ur *userRoutes) signUpManager(ctx *gin.Context) {
 	verified := ur.s.Config.Gin.Mode == "debug"
 	ur.signUp(ctx, 2, verified, "manager")
+}
+
+// TODO: change the verified to an email with kafka
+func (ur *userRoutes) signUpSalesRep(ctx *gin.Context) {
+	verified := ur.s.Config.Gin.Mode == "debug"
+	ur.signUp(ctx, 3, verified, "sales_rep")
+}
+
+// TODO: change the verified to an email with kafka
+func (ur *userRoutes) signUpSupportRep(ctx *gin.Context) {
+	verified := ur.s.Config.Gin.Mode == "debug"
+	ur.signUp(ctx, 4, verified, "support_rep")
 }
 
 func (ur *userRoutes) signUp(ctx *gin.Context, roleId uint, verified bool, provider string) {
