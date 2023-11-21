@@ -41,6 +41,8 @@ func newUserRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 		userHandler.POST("/register", r.signUpManager)
 		userHandler.POST("/login", r.signIn)
 		userHandler.GET("/logout", r.logout)
+		userHandler.POST("/register/sales", MW.DeserializeUser("manager"), r.signUpSalesRep)
+		userHandler.POST("/register/support", MW.DeserializeUser("manager"), r.signUpSupportRep)
 
 		userHandler.GET("/me", MW.DeserializeUser("admin,manager,sales_rep,support_rep"), r.getMe)
 		userHandler.PUT("/me", MW.DeserializeUser("admin,manager,sales_rep,support_rep"), r.updateMe)
