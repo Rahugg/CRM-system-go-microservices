@@ -96,7 +96,7 @@ func (tr *taskRoutes) createTask(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, &entity.CustomResponse{
+	ctx.JSON(http.StatusCreated, &entity.CustomResponse{
 		Status:  0,
 		Message: "OK",
 	})
@@ -159,7 +159,7 @@ func (tr *taskRoutes) deleteTask(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	if err := tr.s.DeleteTask(ctx, id); err != nil {
-		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
+		ctx.JSON(http.StatusNoContent, &entity.CustomResponse{
 			Status:  -1,
 			Message: err.Error(),
 		})

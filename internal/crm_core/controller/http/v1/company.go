@@ -86,7 +86,7 @@ func (cr *companyRoutes) createCompany(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, &entity.CustomResponse{
+	ctx.JSON(http.StatusCreated, &entity.CustomResponse{
 		Status:  0,
 		Message: "OK",
 	})
@@ -123,7 +123,7 @@ func (cr *companyRoutes) deleteCompany(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	if err := cr.s.DeleteCompany(ctx, id); err != nil {
-		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
+		ctx.JSON(http.StatusNoContent, &entity.CustomResponse{
 			Status:  -1,
 			Message: err.Error(),
 		})

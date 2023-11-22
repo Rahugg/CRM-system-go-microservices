@@ -234,3 +234,12 @@ func (s *Service) UpdateMe(ctx *gin.Context, newUser *entity2.User) error {
 
 	return nil
 }
+
+func (s *Service) SearchUser(ctx *gin.Context, query string) (*[]entity2.User, error) {
+	users, err := s.Repo.SearchUser(ctx, query)
+	if err != nil {
+		return users, err
+	}
+
+	return users, nil
+}

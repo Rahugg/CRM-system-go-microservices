@@ -152,6 +152,13 @@ func (s *Service) UpdateTask(ctx *gin.Context, newTask entity.TaskEditInput, id 
 		task.AssociatedDealID = newTask.AssociatedDealID
 	}
 
+	if newTask.State != "" {
+		taskChanges.TaskID = task.ID
+		taskChanges.ChangedField = "state"
+		taskChanges.OldValue = task.State
+		taskChanges.NewValue = newTask.State
+		task.State = newTask.State
+	}
 	if err = s.Repo.SaveTask(ctx, task); err != nil {
 		return err
 	}

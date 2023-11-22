@@ -29,6 +29,7 @@ func newUserRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 		adminHandler.PUT("/:id", r.updateUser)
 		adminHandler.DELETE("/:id", r.deleteUser)
 		adminHandler.POST("/", r.createUser)
+		adminHandler.GET("/search", r.searchUser)
 
 		adminHandler.GET("/test", func(ctx *gin.Context) {
 			log.Println("hello from controller")
@@ -194,7 +195,7 @@ func (ur *userRoutes) deleteUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	if err := ur.s.DeleteUser(ctx, id); err != nil {
-		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
+		ctx.JSON(http.StatusNoContent, &entity.CustomResponse{
 			Status:  -1,
 			Message: err.Error(),
 		})
@@ -226,7 +227,7 @@ func (ur *userRoutes) createUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, &entity.CustomResponse{
+	ctx.JSON(http.StatusCreated, &entity.CustomResponse{
 		Status:  0,
 		Message: "OK",
 	})
@@ -270,5 +271,23 @@ func (ur *userRoutes) updateMe(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &entity.CustomResponse{
 		Status:  0,
 		Message: "OK",
+	})
+}
+
+func (ur *userRoutes) searchUser(ctx *gin.Context) {
+	query := ctx.Query("query")
+	users, err := ur.s.SearchUser(ctx, query)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, &entity.CustomResponseWithData{
+			Status:  -1,
+			Message: "Not found",
+			Data:    users,
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, &entity.CustomResponseWithData{
+		Status:  0,
+		Message: "OK",
+		Data:    users,
 	})
 }
