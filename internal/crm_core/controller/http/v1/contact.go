@@ -97,7 +97,7 @@ func (cr *contactRoutes) createContact(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, &entity.CustomResponse{
+	ctx.JSON(http.StatusCreated, &entity.CustomResponse{
 		Status:  0,
 		Message: "OK",
 	})
@@ -132,7 +132,7 @@ func (cr *contactRoutes) deleteContact(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	if err := cr.s.DeleteContact(ctx, id); err != nil {
-		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
+		ctx.JSON(http.StatusNoContent, &entity.CustomResponse{
 			Status:  -1,
 			Message: err.Error(),
 		})

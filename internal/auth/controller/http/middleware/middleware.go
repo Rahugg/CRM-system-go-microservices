@@ -65,7 +65,7 @@ func (m *Middleware) DeserializeUser(roles ...interface{}) gin.HandlerFunc {
 			return
 		}
 
-		user, err := m.Repo.GetUserByIdWithPreload(ctx, fmt.Sprint(sub))
+		user, err := m.Repo.GetUserByIdWithPreload(fmt.Sprint(sub))
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusForbidden, &entity.CustomResponse{
 				Status:  -3,
@@ -74,7 +74,7 @@ func (m *Middleware) DeserializeUser(roles ...interface{}) gin.HandlerFunc {
 			return
 		}
 
-		role, _ := m.Repo.GetRoleById(ctx, user.RoleID)
+		role, _ := m.Repo.GetRoleById(user.RoleID)
 		for _, Role := range roles {
 			if role.Name == Role || Role == "any" {
 				ctx.Set("currentUser", user)

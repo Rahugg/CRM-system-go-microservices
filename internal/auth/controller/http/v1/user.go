@@ -23,11 +23,13 @@ func newUserRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 		adminHandler.Use(MW.CustomLogger())
 		adminHandler.Use(MW.DeserializeUser("admin"))
 
+		adminHandler.POST("/register", r.signUpAdmin)
 		adminHandler.GET("/", r.getUsers)
 		adminHandler.GET("/:id", r.getUser)
 		adminHandler.PUT("/:id", r.updateUser)
 		adminHandler.DELETE("/:id", r.deleteUser)
 		adminHandler.POST("/", r.createUser)
+		adminHandler.GET("/search", r.searchUser)
 
 		adminHandler.GET("/test", func(ctx *gin.Context) {
 			log.Println("hello from controller")
@@ -40,9 +42,11 @@ func newUserRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 		userHandler.POST("/register", r.signUpManager)
 		userHandler.POST("/login", r.signIn)
 		userHandler.GET("/logout", r.logout)
+		userHandler.POST("/register/sales", MW.DeserializeUser("manager"), r.signUpSalesRep)
+		userHandler.POST("/register/support", MW.DeserializeUser("manager"), r.signUpSupportRep)
 
-		userHandler.GET("/me", MW.DeserializeUser("admin,manager,sales_rep,support_rep"), r.getMe)
-		userHandler.PUT("/me", MW.DeserializeUser("admin,manager,sales_rep,support_rep"), r.updateMe)
+		userHandler.GET("/me", MW.DeserializeUser("admin", "manager", "sales_rep", "support_rep"), r.getMe)
+		userHandler.PUT("/me", MW.DeserializeUser("admin", "manager", "sales_rep", "support_rep"), r.updateMe)
 	}
 }
 
@@ -50,9 +54,22 @@ func (ur *userRoutes) signUpAdmin(ctx *gin.Context) {
 	ur.signUp(ctx, 1, true, "admin")
 }
 
+// TODO: change the verified to an email with kafka
 func (ur *userRoutes) signUpManager(ctx *gin.Context) {
 	verified := ur.s.Config.Gin.Mode == "debug"
 	ur.signUp(ctx, 2, verified, "manager")
+}
+
+// TODO: change the verified to an email with kafka
+func (ur *userRoutes) signUpSalesRep(ctx *gin.Context) {
+	verified := ur.s.Config.Gin.Mode == "debug"
+	ur.signUp(ctx, 3, verified, "sales_rep")
+}
+
+// TODO: change the verified to an email with kafka
+func (ur *userRoutes) signUpSupportRep(ctx *gin.Context) {
+	verified := ur.s.Config.Gin.Mode == "debug"
+	ur.signUp(ctx, 4, verified, "support_rep")
 }
 
 func (ur *userRoutes) signUp(ctx *gin.Context, roleId uint, verified bool, provider string) {
@@ -178,7 +195,7 @@ func (ur *userRoutes) deleteUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	if err := ur.s.DeleteUser(ctx, id); err != nil {
-		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
+		ctx.JSON(http.StatusNoContent, &entity.CustomResponse{
 			Status:  -1,
 			Message: err.Error(),
 		})
@@ -210,7 +227,7 @@ func (ur *userRoutes) createUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, &entity.CustomResponse{
+	ctx.JSON(http.StatusCreated, &entity.CustomResponse{
 		Status:  0,
 		Message: "OK",
 	})
@@ -254,5 +271,23 @@ func (ur *userRoutes) updateMe(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &entity.CustomResponse{
 		Status:  0,
 		Message: "OK",
+	})
+}
+
+func (ur *userRoutes) searchUser(ctx *gin.Context) {
+	query := ctx.Query("query")
+	users, err := ur.s.SearchUser(ctx, query)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, &entity.CustomResponseWithData{
+			Status:  -1,
+			Message: "Not found",
+			Data:    users,
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, &entity.CustomResponseWithData{
+		Status:  0,
+		Message: "OK",
+		Data:    users,
 	})
 }

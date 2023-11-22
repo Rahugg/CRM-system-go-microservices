@@ -6,6 +6,7 @@ import (
 	"crm_system/internal/crm_core/controller/http/v1"
 	repoPkg "crm_system/internal/crm_core/repository"
 	servicePkg "crm_system/internal/crm_core/service"
+	"crm_system/internal/crm_core/transport"
 	"crm_system/pkg/crm_core/cache"
 	httpserverPkg "crm_system/pkg/crm_core/httpserver"
 	"crm_system/pkg/crm_core/logger"
@@ -31,8 +32,10 @@ func Run(cfg *crm_core.Configuration) {
 
 	contactCache := cache.NewContactCache(redisClient, 10*time.Minute)
 
+	validateGrpcTransport := transport.NewValidateGrpcTransport(*cfg)
+
 	service := servicePkg.New(cfg, repo, l)
-	middleware := middleware2.New(repo, cfg)
+	middleware := middleware2.New(repo, cfg, validateGrpcTransport)
 	handler := gin.Default()
 
 	v1.NewRouter(handler, service, middleware, contactCache)

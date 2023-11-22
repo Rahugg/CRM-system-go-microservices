@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package authservice;
+
+option go_package = "./;pb";
+
+service AuthService {
+  rpc Validate (ValidateRequest) returns (ValidateResponse) {}
+}
+
+message ValidateRequest{
+  string accessToken = 1;
+  repeated string roles = 2;
+}
+
+message ValidateResponse {
+  ResponseJSON response = 1;
+}
+
+message ResponseJSON {
+  User user = 1;
+  Role role = 2;
+}
+
+message User {
+  string id = 1;
+  string FirstName = 2;
+  string LastName = 3;
+  int64 Age = 4;
+  string Phone = 5;
+  int64 RoleID  = 6;
+  string Email = 7;
+  string Provider = 8;
+  string Password = 9;
+}
+
+message Role {
+  int64 ID = 1;
+  string Name = 2;
+}

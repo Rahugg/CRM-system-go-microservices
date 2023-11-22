@@ -8,19 +8,19 @@ import (
 	"strings"
 )
 
-func (r *AuthRepo) GetUserByIdWithPreload(ctx *gin.Context, id string) (*entity.User, error) {
+func (r *AuthRepo) GetUserByIdWithPreload(id string) (*entity.User, error) {
 	var user entity.User
 	if err := r.DB.Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, errors.New("the user belonging to this token no logger exists")
 	}
 	return &user, nil
 }
-func (r *AuthRepo) GetUser(ctx *gin.Context, id string) (*entity.User, error) {
-	var user entity.User
+func (r *AuthRepo) GetUser(id string) (*entity.User, error) {
+	var user *entity.User
 	if err := r.DB.Where("id = ?", fmt.Sprint(id)).First(&user).Error; err != nil {
 		return nil, errors.New("the user belonging to this token no logger exists")
 	}
-	return &user, nil
+	return user, nil
 }
 
 func (r *AuthRepo) GetUserByEmail(ctx *gin.Context, email string) (*entity.User, error) {
@@ -72,4 +72,14 @@ func (r *AuthRepo) DeleteUser(ctx *gin.Context, id string, user *entity.User) er
 		return err
 	}
 	return nil
+}
+
+func (r *AuthRepo) SearchUser(ctx *gin.Context, query string) (*[]entity.User, error) {
+	var users *[]entity.User
+
+	if err := r.DB.Where("first_name ILIKE ?", "%"+query+"%").Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }

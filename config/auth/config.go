@@ -3,6 +3,7 @@ package auth
 import (
 	"github.com/spf13/viper"
 	"log"
+	"time"
 )
 
 type (
@@ -10,11 +11,11 @@ type (
 	Configuration struct {
 		App  `yaml:"app"`
 		HTTP `yaml:"http"`
+		Grpc `yaml:"Grpc"`
 		Log  `yaml:"logger"`
 		Gin  `yaml:"gin"`
 		DB   `yaml:"db"`
-		//Auth `yaml:"auth"`
-		Jwt `yaml:"jwt"`
+		Jwt  `yaml:"jwt"`
 	}
 
 	// App -.
@@ -49,21 +50,20 @@ type (
 		Port     int64  `env-required:"true" yaml:"port" env:"DB_PORT"`
 	}
 
-	//Auth struct {
-	//	Login    string `mapstructure:"login"`
-	//	Password string `mapstructure:"pass"`
-	//}
+	Grpc struct {
+		Port string `yaml:"Port"`
+	}
 
 	Jwt struct {
-		AccessPrivateKey     string `mapstructure:"access_private_key"`
-		AccessPublicKey      string `mapstructure:"access_public_key"`
-		AccessTokenExpiredIn int64  `mapstructure:"access_token_expired_in"`
-		AccessTokenMaxAge    int64  `mapstructure:"access_token_max_age"`
+		AccessPrivateKey     string        `mapstructure:"access_private_key"`
+		AccessPublicKey      string        `mapstructure:"access_public_key"`
+		AccessTokenExpiredIn time.Duration `mapstructure:"access_token_expired_in"`
+		AccessTokenMaxAge    int64         `mapstructure:"access_token_max_age"`
 
-		RefreshPrivateKey     string `mapstructure:"refresh_private_key"`
-		RefreshPublicKey      string `mapstructure:"refresh_public_key"`
-		RefreshTokenExpiredIn int64  `mapstructure:"refresh_token_expired_in"`
-		RefreshTokenMaxAge    int64  `mapstructure:"refresh_token_max_age"`
+		RefreshPrivateKey     string        `mapstructure:"refresh_private_key"`
+		RefreshPublicKey      string        `mapstructure:"refresh_public_key"`
+		RefreshTokenExpiredIn time.Duration `mapstructure:"refresh_token_expired_in"`
+		RefreshTokenMaxAge    int64         `mapstructure:"refresh_token_max_age"`
 	}
 )
 

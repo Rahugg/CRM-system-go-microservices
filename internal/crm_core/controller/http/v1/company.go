@@ -20,6 +20,7 @@ func newCompanyRoutes(handler *gin.RouterGroup, s *service.Service, MW *middlewa
 	companyHandler := handler.Group("/company")
 	{
 		//middleware for users
+		companyHandler.Use(MW.DeserializeUser("any"))
 		companyHandler.GET("/", r.getCompanies)
 		companyHandler.GET("/:id", r.getCompany)
 		companyHandler.POST("/", r.createCompany)
@@ -85,7 +86,7 @@ func (cr *companyRoutes) createCompany(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, &entity.CustomResponse{
+	ctx.JSON(http.StatusCreated, &entity.CustomResponse{
 		Status:  0,
 		Message: "OK",
 	})
@@ -122,7 +123,7 @@ func (cr *companyRoutes) deleteCompany(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	if err := cr.s.DeleteCompany(ctx, id); err != nil {
-		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
+		ctx.JSON(http.StatusNoContent, &entity.CustomResponse{
 			Status:  -1,
 			Message: err.Error(),
 		})

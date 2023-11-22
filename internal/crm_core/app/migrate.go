@@ -15,6 +15,8 @@ func Migrate(repo *repository.CRMSystemRepo, l *logger.Logger) {
 		&entityRepo.Deal{},
 		&entityRepo.Task{},
 		&entityRepo.Ticket{},
+		&entityRepo.Vote{},
+		&entityRepo.TaskChanges{},
 	)
 	if err != nil {
 		l.Fatal("Automigration failed")
