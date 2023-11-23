@@ -9,7 +9,6 @@ import (
 	"crm_system/pkg/auth/utils"
 	"fmt"
 	"github.com/spf13/cast"
-	"log"
 )
 
 type Service struct {
@@ -28,7 +27,6 @@ func NewService(logger *logger.Logger, repo *repository.AuthRepo, config *auth.C
 }
 
 func (s *Service) Validate(ctx context.Context, request *pb.ValidateRequest) (*pb.ValidateResponse, error) {
-	log.Println(1)
 	sub, err := utils.ValidateToken(request.AccessToken, s.config.Jwt.AccessPrivateKey)
 	if err != nil {
 		s.logger.Error("failed to ValidateToken err %v", err)

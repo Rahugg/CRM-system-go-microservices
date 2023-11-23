@@ -1,6 +1,3 @@
-include .env.example
-export
-
 LOCAL_BIN:=$(CURDIR)/bin
 PATH:=$(LOCAL_BIN):$(PATH)
 
@@ -54,18 +51,15 @@ integration-test: ### run integration-test
 	go clean -testcache && go test -v ./integration-test/...
 .PHONY: integration-test
 
-mock: ### run mockgen
-	mockgen -source ./internal/usecase/interfaces.go -package usecase_test > ./internal/usecase/mocks_test.go
+mock-data: ### run mockgen
+	go run migrations/crm_mock/crm_mock.go && go run migrations/auth_mock/auth_mock.go
 .PHONY: mock
 
-migrate-create:  ### create new migration
-	migrate create - ext sql -dir migrations "migrate_name"
-.PHONY: migrate-create
-
 migrate-up: ### migration up
-	migrate -path migrations -database '$(PG_URL)?sslmode=disable' up
+	go run migrations/auth/migrate.go && go run migrations/crm_core/migrate.go
+
 .PHONY: migrate-up
 
 migrate-down: ### migration down
-	migrate -path migrations -database '$(PG_URL)?sslmode=disable' down
+	go run migrations/auth_down/migrate_down.go && go run migrations/crm_core_down/migrate_down.go
 .PHONY: migrate-down
