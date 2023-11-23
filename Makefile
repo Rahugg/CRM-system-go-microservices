@@ -1,5 +1,3 @@
-include .env.example
-export
 
 LOCAL_BIN:=$(CURDIR)/bin
 PATH:=$(LOCAL_BIN):$(PATH)
@@ -63,9 +61,10 @@ migrate-create:  ### create new migration
 .PHONY: migrate-create
 
 migrate-up: ### migration up
-	migrate -path migrations -database '$(PG_URL)?sslmode=disable' up
+	go run migrations/auth/migrate.go && go run migrations/crm_core/migrate.go
+
 .PHONY: migrate-up
 
 migrate-down: ### migration down
-	migrate -path migrations -database '$(PG_URL)?sslmode=disable' down
+	go run migrations/auth_down/migrate_down.go && go run migrations/crm_core_down/migrate_down.go
 .PHONY: migrate-down
