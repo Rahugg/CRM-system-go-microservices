@@ -6,6 +6,7 @@ import (
 	pb "crm_system/pkg/auth/authservice/gw"
 	"fmt"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type ValidateGrpcTransport struct {
@@ -14,7 +15,7 @@ type ValidateGrpcTransport struct {
 }
 
 func NewValidateGrpcTransport(config crm_core.Configuration) *ValidateGrpcTransport {
-	opts := []grpc.DialOption{grpc.WithInsecure()}
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 
 	conn, _ := grpc.Dial(config.Transport.ValidateGrpc.Host, opts...)
 

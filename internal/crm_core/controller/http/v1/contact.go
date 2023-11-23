@@ -125,7 +125,7 @@ func (cr *contactRoutes) updateContact(ctx *gin.Context) {
 
 	err := cr.contactCache.Set(ctx, id, &newContact)
 	if err != nil {
-		log.Printf("could not cache contact with id %s: %v", id, err)
+		cr.l.Debug("could not cache contact with id %s: %v", id, err)
 	}
 
 	ctx.JSON(http.StatusOK, &entity.CustomResponse{

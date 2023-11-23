@@ -6,7 +6,6 @@ import (
 	"crm_system/internal/auth/service"
 	"crm_system/pkg/auth/logger"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 )
 
@@ -31,10 +30,7 @@ func newUserRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 		adminHandler.POST("/", r.createUser)
 		adminHandler.GET("/search", r.searchUser)
 
-		adminHandler.GET("/test", func(ctx *gin.Context) {
-			log.Println("hello from controller")
-			ctx.JSON(http.StatusOK, "test")
-		})
+		adminHandler.GET("/test", r.test)
 	}
 
 	userHandler := handler.Group("/user")
@@ -48,6 +44,11 @@ func newUserRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 		userHandler.GET("/me", MW.DeserializeUser("admin", "manager", "sales_rep", "support_rep"), r.getMe)
 		userHandler.PUT("/me", MW.DeserializeUser("admin", "manager", "sales_rep", "support_rep"), r.updateMe)
 	}
+}
+
+func (ur *userRoutes) test(ctx *gin.Context) {
+	ur.l.Info("hello from controller")
+	ctx.JSON(http.StatusOK, "test")
 }
 
 func (ur *userRoutes) signUpAdmin(ctx *gin.Context) {

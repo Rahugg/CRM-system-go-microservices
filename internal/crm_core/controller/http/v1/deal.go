@@ -4,14 +4,12 @@ import (
 	"crm_system/internal/crm_core/controller/http/middleware"
 	"crm_system/internal/crm_core/entity"
 	"crm_system/internal/crm_core/service"
-	"crm_system/pkg/crm_core/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type dealRoutes struct {
 	s *service.Service
-	l *logger.Logger
 }
 
 func newDealRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.Middleware) {

@@ -12,11 +12,15 @@ func main() {
 	l := logger.New(cfg.Gin.Mode)
 	repo := repoPkg.New(cfg, l)
 
-	repo.DB.Migrator().DropTable(&entityRepo.Company{},
+	err := repo.DB.Migrator().DropTable(&entityRepo.Company{},
 		&entityRepo.Contact{},
 		&entityRepo.Deal{},
 		&entityRepo.Task{},
 		&entityRepo.Ticket{},
 		&entityRepo.Vote{},
 		&entityRepo.TaskChanges{})
+	if err != nil {
+		l.Error("error happened: %s", err)
+		return
+	}
 }

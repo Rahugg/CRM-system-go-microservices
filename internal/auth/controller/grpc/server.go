@@ -3,6 +3,7 @@ package grpc
 import (
 	"fmt"
 	"google.golang.org/grpc"
+	"log"
 	"net"
 
 	pb "crm_system/pkg/auth/authservice/gw"
@@ -37,7 +38,12 @@ func (s *Server) Start() error {
 
 	pb.RegisterAuthServiceServer(s.grpcServer, s.service)
 
-	go s.grpcServer.Serve(listener)
+	go func() {
+		err = s.grpcServer.Serve(listener)
+		if err != nil {
+			log.Fatalf("error happened in grpc: %s", err)
+		}
+	}()
 
 	return nil
 }
