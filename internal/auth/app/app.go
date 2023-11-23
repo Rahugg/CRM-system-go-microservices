@@ -21,7 +21,6 @@ func Run(cfg *auth.Configuration) {
 	l := logger.New(cfg.Gin.Mode)
 	repo := repoPkg.New(cfg, l)
 
-	fmt.Println(cfg)
 	service := servicePkg.New(cfg, repo, l)
 	middleware := middleware2.New(repo, cfg)
 	handler := gin.Default()

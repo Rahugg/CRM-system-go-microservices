@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"time"
 )
 
 type taskRoutes struct {
@@ -84,6 +85,14 @@ func (tr *taskRoutes) createTask(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, &entity.CustomResponse{
 			Status:  -1,
 			Message: err.Error(),
+		})
+		return
+	}
+
+	if time.Now().After(task.DueDate) {
+		ctx.JSON(http.StatusBadRequest, &entity.CustomResponse{
+			Status:  -1,
+			Message: "Due date must be in the future",
 		})
 		return
 	}

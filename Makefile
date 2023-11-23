@@ -63,3 +63,11 @@ migrate-up: ### migration up
 migrate-down: ### migration down
 	go run migrations/auth_down/migrate_down.go && go run migrations/crm_core_down/migrate_down.go
 .PHONY: migrate-down
+
+start-auth:
+	go run cmd/auth/main.go
+.PHONY: start-auth
+
+start-crm:
+	go run cmd/crm_core/main.go
+.PHONY: start-crm
