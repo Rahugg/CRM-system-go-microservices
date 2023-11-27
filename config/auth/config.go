@@ -9,13 +9,14 @@ import (
 type (
 	// Configuration -.
 	Configuration struct {
-		App  `yaml:"app"`
-		HTTP `yaml:"http"`
-		Grpc `yaml:"Grpc"`
-		Log  `yaml:"logger"`
-		Gin  `yaml:"gin"`
-		DB   `yaml:"db"`
-		Jwt  `yaml:"jwt"`
+		App   `yaml:"app"`
+		HTTP  `yaml:"http"`
+		Grpc  `yaml:"Grpc"`
+		Log   `yaml:"logger"`
+		Gin   `yaml:"gin"`
+		DB    `yaml:"db"`
+		Jwt   `yaml:"jwt"`
+		Kafka `yaml:"kafka"`
 	}
 
 	// App -.
@@ -64,6 +65,17 @@ type (
 		RefreshPublicKey      string        `mapstructure:"refresh_public_key"`
 		RefreshTokenExpiredIn time.Duration `mapstructure:"refresh_token_expired_in"`
 		RefreshTokenMaxAge    int64         `mapstructure:"refresh_token_max_age"`
+	}
+	Kafka struct {
+		Brokers  []string `yaml:"brokers"`
+		Producer Producer `yaml:"producer"`
+		Consumer Consumer `yaml:"consumer"`
+	}
+	Producer struct {
+		Topic string `yaml:"topic"`
+	}
+	Consumer struct {
+		Topics []string `yaml:"topics"`
 	}
 )
 

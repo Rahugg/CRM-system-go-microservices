@@ -4,15 +4,14 @@ import (
 	"crm_system/internal/crm_core/controller/http/middleware"
 	"crm_system/internal/crm_core/entity"
 	"crm_system/internal/crm_core/service"
-	"crm_system/pkg/crm_core/logger"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"time"
 )
 
 type taskRoutes struct {
 	s *service.Service
-	l *logger.Logger
 }
 
 func newTaskRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.Middleware) {
@@ -84,6 +83,14 @@ func (tr *taskRoutes) createTask(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, &entity.CustomResponse{
 			Status:  -1,
 			Message: err.Error(),
+		})
+		return
+	}
+
+	if time.Now().After(task.DueDate) {
+		ctx.JSON(http.StatusBadRequest, &entity.CustomResponse{
+			Status:  -1,
+			Message: "Due date must be in the future",
 		})
 		return
 	}

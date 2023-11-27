@@ -17,6 +17,7 @@ func main() {
 	err := repo.DB.AutoMigrate(
 		&entityRepo.User{},
 		&entityRepo.Role{},
+		&entityRepo.UserCode{},
 	)
 	if err != nil {
 		l.Fatal("Automigration failed")

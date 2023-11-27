@@ -11,5 +11,9 @@ func main() {
 	cfg := auth.NewConfig()
 	l := logger.New(cfg.Gin.Mode)
 	repo := repoPkg.New(cfg, l)
-	repo.DB.Migrator().DropTable(&entityRepo.User{}, &entityRepo.Role{})
+	err := repo.DB.Migrator().DropTable(&entityRepo.User{}, &entityRepo.Role{})
+	if err != nil {
+		l.Error("error happened: %s", err)
+		return
+	}
 }

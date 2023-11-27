@@ -2,11 +2,13 @@ package app
 
 import (
 	"crm_system/config/auth"
+	"crm_system/internal/auth/controller/consumer"
 	"crm_system/internal/auth/controller/grpc"
 	middleware2 "crm_system/internal/auth/controller/http/middleware"
 	"crm_system/internal/auth/controller/http/v1"
 	repoPkg "crm_system/internal/auth/repository"
 	servicePkg "crm_system/internal/auth/service"
+	"crm_system/internal/kafka"
 	httpserver2 "crm_system/pkg/auth/httpserver"
 	"crm_system/pkg/auth/logger"
 	"fmt"
@@ -21,14 +23,27 @@ func Run(cfg *auth.Configuration) {
 	l := logger.New(cfg.Gin.Mode)
 	repo := repoPkg.New(cfg, l)
 
-	fmt.Println(cfg)
-	service := servicePkg.New(cfg, repo, l)
+	userVerificationProducer, err := kafka.NewProducer(cfg)
+	if err != nil {
+		l.Fatal("failed NewProducer err: %v", err)
+	}
+
+	userVerificationConsumerCallback := consumer.NewUserVerificationCallback(l)
+
+	userVerificationConsumer, err := kafka.NewConsumer(l, cfg, userVerificationConsumerCallback)
+	if err != nil {
+		l.Fatal("failed NewConsumer err: %v", err)
+	}
+
+	go userVerificationConsumer.Start()
+
+	service := servicePkg.New(cfg, repo, userVerificationProducer)
 	middleware := middleware2.New(repo, cfg)
 	handler := gin.Default()
 
 	grpcService := grpc.NewService(l, repo, cfg)
 	grpcServer := grpc.NewServer(cfg.Grpc.Port, grpcService)
-	err := grpcServer.Start()
+	err = grpcServer.Start()
 	if err != nil {
 		log.Panicf("failed to start grpc-server err: %v", err)
 	}
