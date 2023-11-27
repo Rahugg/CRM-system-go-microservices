@@ -7,6 +7,7 @@ import (
 	"crm_system/pkg/auth/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"sync"
 )
 
 type userRoutes struct {
@@ -36,6 +37,7 @@ func newUserRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 	userHandler := handler.Group("/user")
 	{
 		userHandler.POST("/register", r.signUpManager)
+		userHandler.POST("/confirm", r.confirmUser)
 		userHandler.POST("/login", r.signIn)
 		userHandler.GET("/logout", r.logout)
 		userHandler.POST("/register/sales", MW.DeserializeUser("manager"), r.signUpSalesRep)
@@ -52,28 +54,22 @@ func (ur *userRoutes) test(ctx *gin.Context) {
 }
 
 func (ur *userRoutes) signUpAdmin(ctx *gin.Context) {
-	ur.signUp(ctx, 1, true, "admin")
+	ur.signUp(ctx, 1, "admin")
 }
 
-// TODO: change the verified to an email with kafka
 func (ur *userRoutes) signUpManager(ctx *gin.Context) {
-	verified := ur.s.Config.Gin.Mode == "debug"
-	ur.signUp(ctx, 2, verified, "manager")
+	ur.signUp(ctx, 2, "manager")
 }
 
-// TODO: change the verified to an email with kafka
 func (ur *userRoutes) signUpSalesRep(ctx *gin.Context) {
-	verified := ur.s.Config.Gin.Mode == "debug"
-	ur.signUp(ctx, 3, verified, "sales_rep")
+	ur.signUp(ctx, 3, "sales_rep")
 }
 
-// TODO: change the verified to an email with kafka
 func (ur *userRoutes) signUpSupportRep(ctx *gin.Context) {
-	verified := ur.s.Config.Gin.Mode == "debug"
-	ur.signUp(ctx, 4, verified, "support_rep")
+	ur.signUp(ctx, 4, "support_rep")
 }
 
-func (ur *userRoutes) signUp(ctx *gin.Context, roleId uint, verified bool, provider string) {
+func (ur *userRoutes) signUp(ctx *gin.Context, roleId uint, provider string) {
 	var payload entity.SignUpInput
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, &entity.CustomResponse{
@@ -83,7 +79,7 @@ func (ur *userRoutes) signUp(ctx *gin.Context, roleId uint, verified bool, provi
 		return
 	}
 
-	data, err := ur.s.SignUp(ctx, &payload, roleId, verified, provider)
+	id, err := ur.s.SignUp(ctx, &payload, roleId, provider)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, &entity.CustomResponse{
 			Status:  -2,
@@ -91,10 +87,14 @@ func (ur *userRoutes) signUp(ctx *gin.Context, roleId uint, verified bool, provi
 		})
 		return
 	}
-	ctx.JSON(http.StatusOK, &entity.CustomResponseWithData{
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go ur.createUserCode(ctx, id, &wg)
+	wg.Wait()
+	ctx.JSON(http.StatusOK, &entity.CustomResponse{
 		Status:  0,
-		Message: "OK",
-		Data:    data,
+		Message: "go confirm yourself",
 	})
 }
 func (ur *userRoutes) signIn(ctx *gin.Context) {
@@ -291,4 +291,40 @@ func (ur *userRoutes) searchUser(ctx *gin.Context) {
 		Message: "OK",
 		Data:    users,
 	})
+}
+
+func (ur *userRoutes) createUserCode(ctx *gin.Context, id string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	err := ur.s.CreateUserCode(ctx, id)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
+			Status:  -1,
+			Message: err.Error(),
+		})
+		return
+	}
+}
+
+func (ur *userRoutes) confirmUser(ctx *gin.Context) {
+	var code entity.InputCode
+
+	err := ctx.ShouldBindJSON(&code)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, &entity.CustomResponse{
+			Status:  -1,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	err = ur.s.ConfirmUser(ctx, code.Code)
+	if err != nil {
+		ur.l.Error(err.Error())
+		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
+			Status:  -2,
+			Message: err.Error(),
+		})
+		return
+	}
+
 }

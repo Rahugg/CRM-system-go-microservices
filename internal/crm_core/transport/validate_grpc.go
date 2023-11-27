@@ -33,6 +33,7 @@ func (t *ValidateGrpcTransport) ValidateTransport(ctx context.Context, accessTok
 		AccessToken: accessToken,
 		Roles:       roles,
 	})
+
 	if err != nil {
 		return nil, fmt.Errorf("cannot Validate: %w", err)
 	}
