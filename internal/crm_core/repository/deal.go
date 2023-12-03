@@ -2,16 +2,20 @@ package repository
 
 import (
 	"crm_system/internal/crm_core/entity"
+	"crm_system/internal/crm_core/metrics"
 	"github.com/gin-gonic/gin"
 )
 
 func (r *CRMSystemRepo) GetDeals(ctx *gin.Context) (*[]entity.Deal, error) {
 	var deals *[]entity.Deal
+	ok, fail := metrics.DatabaseQueryTime("GetDeals")
+	defer fail()
 
 	if err := r.DB.Find(&deals).Error; err != nil {
 		return nil, err
 	}
 
+	ok()
 	return deals, nil
 }
 

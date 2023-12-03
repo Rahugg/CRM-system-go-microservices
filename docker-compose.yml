@@ -40,6 +40,24 @@ services:
       KAFKA_BROKERCONNECT: "kafka1:9092"
     depends_on:
       - kafka1
+
+  prometheus:
+    image: prom/prometheus:v2.9.2
+    ports:
+      - 9091:9090
+    volumes:
+      - ./pkg/crm_core/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:10.2.2
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=secret
+    volumes:
+      - ./pkg/crm_core/grafana/provisioning:/etc/grafana/provisioning
+      - ./pkg/crm_core/grafana/dashboards:/var/lib/grafana/dashboards
+
   auth-service:
     image: auth-service
     container_name: as-auth

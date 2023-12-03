@@ -2,15 +2,20 @@ package repository
 
 import (
 	"crm_system/internal/crm_core/entity"
+	"crm_system/internal/crm_core/metrics"
 	"github.com/gin-gonic/gin"
 )
 
 func (r *CRMSystemRepo) GetContacts(ctx *gin.Context) (*[]entity.Contact, error) {
 	var contacts *[]entity.Contact
+	ok, fail := metrics.DatabaseQueryTime("GetContacts")
+	defer fail()
 
 	if err := r.DB.Find(&contacts).Error; err != nil {
 		return nil, err
 	}
+
+	ok()
 
 	return contacts, nil
 }

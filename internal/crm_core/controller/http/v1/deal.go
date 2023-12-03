@@ -18,6 +18,7 @@ func newDealRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 	dealHandler := handler.Group("/deal")
 	{
 		//middleware for users
+		dealHandler.Use(MW.MetricsHandler())
 		dealHandler.GET("/", r.getDeals)
 		dealHandler.GET("/:id", r.getDeal)
 		dealHandler.POST("/", r.createDeal)

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"crm_system/internal/crm_core/entity"
+	"crm_system/internal/crm_core/metrics"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -10,9 +11,14 @@ import (
 func (r *CRMSystemRepo) GetTasks(ctx *gin.Context) (*[]entity.Task, error) {
 	var tasks *[]entity.Task
 
+	ok, fail := metrics.DatabaseQueryTime("GetTasks")
+	defer fail()
+
 	if err := r.DB.Find(&tasks).Error; err != nil {
 		return nil, err
 	}
+
+	ok()
 
 	return tasks, nil
 }

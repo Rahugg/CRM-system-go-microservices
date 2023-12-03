@@ -5,6 +5,7 @@ import (
 	"crm_system/internal/crm_core/service"
 	"crm_system/pkg/crm_core/cache"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 )
 
@@ -17,8 +18,12 @@ func NewRouter(handler *gin.Engine, s *service.Service, MW *middleware.Middlewar
 		})
 	})
 
+	handler.GET("/metrics", gin.WrapH(promhttp.Handler()))
+
 	h := handler.Group("/v1")
 	{
+		handler.Use(MW.MetricsHandler())
+
 		newCompanyRoutes(h, s, MW)
 		newContactRoutes(h, s, MW, cc)
 		newDealRoutes(h, s, MW)

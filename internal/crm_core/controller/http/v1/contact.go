@@ -23,6 +23,7 @@ func newContactRoutes(handler *gin.RouterGroup, s *service.Service, MW *middlewa
 	contactHandler := handler.Group("/contact")
 	{
 		//middleware for users
+		contactHandler.Use(MW.MetricsHandler())
 		contactHandler.GET("/", r.getContacts)
 		contactHandler.GET("/:id", r.getContact)
 		contactHandler.POST("/", r.createContact)
