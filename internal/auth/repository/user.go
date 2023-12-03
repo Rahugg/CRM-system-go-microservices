@@ -120,3 +120,19 @@ func (r *AuthRepo) ConfirmUser(code string) error {
 	}
 	return nil
 }
+
+func (r *AuthRepo) SortUsers(users *[]entity.User, sortBy, sortOrder string) (*[]entity.User, error) {
+	if err := r.DB.Order(sortBy + " " + sortOrder).Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
+func (r *AuthRepo) FilterUsersByAge(users *[]entity.User, age string) (*[]entity.User, error) {
+	if err := r.DB.Where("age > ?", age).Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}

@@ -33,6 +33,12 @@ func (r *CRMSystemRepo) GetTasksByDealId(dealId string) ([]entity.Task, error) {
 	}
 	return tasks, nil
 }
+func (r *CRMSystemRepo) CreateTaskChanges(ctx *gin.Context, taskChanges *entity.TaskChanges) error {
+	if err := r.DB.Create(&taskChanges).Error; err != nil {
+		return err
+	}
+	return nil
+}
 
 func (r *CRMSystemRepo) CreateTask(ctx *gin.Context, newTask *entity.TaskInput) error {
 	task := &entity.Task{
@@ -82,4 +88,29 @@ func (r *CRMSystemRepo) DeleteTask(ctx *gin.Context, id string, task *entity.Tas
 		return err
 	}
 	return nil
+}
+func (r *CRMSystemRepo) SearchTask(ctx *gin.Context, query string) (*[]entity.Task, error) {
+	var tasks *[]entity.Task
+
+	if err := r.DB.Where("name ILIKE ?", "%"+query+"%").Find(&tasks).Error; err != nil {
+		return nil, err
+	}
+
+	return tasks, nil
+}
+
+func (r *CRMSystemRepo) SortTasks(tasks []map[string]interface{}, sortBy, sortOrder string) ([]map[string]interface{}, error) {
+	if err := r.DB.Order(sortBy + " " + sortOrder).Find(&tasks).Error; err != nil {
+		return nil, err
+	}
+
+	return tasks, nil
+}
+
+func (r *CRMSystemRepo) FilterTasksByStates(tasks []map[string]interface{}, state string) ([]map[string]interface{}, error) {
+	if err := r.DB.Where("state = ?", state).Find(&tasks).Error; err != nil {
+		return nil, err
+	}
+
+	return tasks, nil
 }

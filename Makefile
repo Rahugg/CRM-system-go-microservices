@@ -18,38 +18,9 @@ compose-down: ### Down docker-compose
 	docker-compose down --remove-orphans
 .PHONY: compose-down
 
-swag-v1: ### swag init
-	swag init -g internal/controller/http/v1/router.go
-.PHONY: swag-v1
-
-run: swag-v1 ### swag run
-	go mod tidy && go mod download && \
-	DISABLE_SWAGGER_HTTP_HANDLER='' GIN_MODE=debug CGO_ENABLED=0 go run -tags migrate ./cmd/app
-.PHONY: run
-
 docker-rm-volume: ### remove docker volume
 	docker volume rm go-clean-template_pg-data
 .PHONY: docker-rm-volume
-
-linter-golangci: ### check by golangci linter
-	golangci-lint run
-.PHONY: linter-golangci
-
-linter-hadolint: ### check by hadolint linter
-	git ls-files --exclude='Dockerfile*' --ignored | xargs hadolint
-.PHONY: linter-hadolint
-
-linter-dotenv: ### check by dotenv linter
-	dotenv-linter
-.PHONY: linter-dotenv
-
-test: ### run test
-	go test -v -cover -race ./internal/...
-.PHONY: test
-
-integration-test: ### run integration-test
-	go clean -testcache && go test -v ./integration-test/...
-.PHONY: integration-test
 
 mock-data: ### run mockgen
 	go run migrations/crm_mock/crm_mock.go && go run migrations/auth_mock/auth_mock.go
@@ -71,3 +42,19 @@ start-auth:
 start-crm:
 	go run cmd/crm_core/main.go
 .PHONY: start-crm
+
+build-dockerfile-auth:
+	docker build -f dockerfile-auth -t auth-service .
+./PHONY: build-dockerfile-auth
+
+build-dockerfile-crm:
+	docker build -f dockerfile-crm -t crm-service .
+./PHONY: build-dockerfile-crm
+
+swag-auth:
+	cd internal/auth && swag init --parseDependency --parseInternal -g ../../cmd/auth/main.go
+./PHONY: swag-auth
+
+swag-crm:
+	cd internal/crm_core && swag init --parseDependency --parseInternal -g ../../cmd/crm_core/main.go
+./PHONY: swag-crm

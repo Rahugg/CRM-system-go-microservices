@@ -47,3 +47,28 @@ func (r *CRMSystemRepo) DeleteDeal(ctx *gin.Context, id string, deal *entity.Dea
 	}
 	return nil
 }
+
+func (r *CRMSystemRepo) SearchDeal(ctx *gin.Context, query string) (*[]entity.Deal, error) {
+	var deals *[]entity.Deal
+
+	if err := r.DB.Where("title ILIKE ?", "%"+query+"%").Find(&deals).Error; err != nil {
+		return nil, err
+	}
+
+	return deals, nil
+}
+func (r *CRMSystemRepo) SortDeals(deals *[]entity.Deal, sortBy, sortOrder string) (*[]entity.Deal, error) {
+	if err := r.DB.Order(sortBy + " " + sortOrder).Find(&deals).Error; err != nil {
+		return nil, err
+	}
+
+	return deals, nil
+}
+
+func (r *CRMSystemRepo) FilterDealsByStatus(deals *[]entity.Deal, status string) (*[]entity.Deal, error) {
+	if err := r.DB.Where("status = ?", status).Find(&deals).Error; err != nil {
+		return nil, err
+	}
+
+	return deals, nil
+}

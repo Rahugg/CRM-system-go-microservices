@@ -4,6 +4,7 @@ import (
 	"crm_system/internal/auth/controller/http/middleware"
 	"crm_system/internal/auth/entity"
 	"crm_system/internal/auth/service"
+	_ "crm_system/internal/crm_core/entity"
 	"crm_system/pkg/auth/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -69,6 +70,16 @@ func (ur *userRoutes) signUpSupportRep(ctx *gin.Context) {
 	ur.signUp(ctx, 4, "support_rep")
 }
 
+// signUp godoc
+// @Summary Зарегистрировать пользователя с помощью signUp
+// @Description Зарегистрировать пользователя с помощью signUp
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param signUp body entity.SignUpInput true "Register user"
+// @Success 200 {object} entity.CustomResponse
+// @Failure 400 {object} entity.CustomResponse
+// @Router /v1/user/register [post]
 func (ur *userRoutes) signUp(ctx *gin.Context, roleId uint, provider string) {
 	var payload entity.SignUpInput
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
@@ -97,6 +108,17 @@ func (ur *userRoutes) signUp(ctx *gin.Context, roleId uint, provider string) {
 		Message: "go confirm yourself",
 	})
 }
+
+// signIn godoc
+// @Summary Авторизовать пользователя с помощью signUp
+// @Description Авторизовать пользователя с помощью signIn
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param signIn body entity.SignInInput true "Authorize user"
+// @Success 200 {object} entity.CustomResponseWithData
+// @Failure 400 {object} entity.CustomResponse
+// @Router /v1/user/login [post]
 func (ur *userRoutes) signIn(ctx *gin.Context) {
 	var payload *entity.SignInInput
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
@@ -129,8 +151,25 @@ func (ur *userRoutes) logout(ctx *gin.Context) {
 	})
 }
 
+// getUsers godoc
+// @Summary Получить список пользователей
+// @Description Получить список пользователей
+// @Tags admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param sortBy query string true "sortBy"
+// @Param sortOrder query string true "sortOrder"
+// @Param age query string true "filter by age"
+// @Success 200 {object} entity.CustomResponseWithData
+// @Failure 400 {object} entity.CustomResponse
+// @Router /v1/admin/user/ [get]
 func (ur *userRoutes) getUsers(ctx *gin.Context) {
-	users, err := ur.s.GetUsers(ctx)
+	sortBy := ctx.Query("sortBy")
+	sortOrder := ctx.Query("sortOrder")
+	age := ctx.Query("age")
+
+	users, err := ur.s.GetUsers(ctx, sortBy, sortOrder, age)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
@@ -147,6 +186,17 @@ func (ur *userRoutes) getUsers(ctx *gin.Context) {
 	})
 }
 
+// getUser godoc
+// @Summary Получить пользователя по id
+// @Description Получить пользователя по id
+// @Tags admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "id user"
+// @Success 200 {object} entity.CustomResponseWithData
+// @Failure 400 {object} entity.CustomResponse
+// @Router /v1/admin/user/{id} [get]
 func (ur *userRoutes) getUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -166,6 +216,19 @@ func (ur *userRoutes) getUser(ctx *gin.Context) {
 		Data:    user,
 	})
 }
+
+// updateUser godoc
+// @Summary Редактировать пользователя по id
+// @Description Редактировать пользователя по id
+// @Tags admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "id user"
+// @Param inputUser body entity.User true "Update User"
+// @Success 200 {object} entity.CustomResponse
+// @Failure 400 {object} entity.CustomResponse
+// @Router /v1/admin/user/{id} [put]
 func (ur *userRoutes) updateUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -192,6 +255,18 @@ func (ur *userRoutes) updateUser(ctx *gin.Context) {
 		Message: "OK",
 	})
 }
+
+// deleteUser godoc
+// @Summary Удалить пользователя по id
+// @Description Удалить пользователя по id
+// @Tags admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "id user"
+// @Success 200 {object} entity.CustomResponse
+// @Failure 400 {object} entity.CustomResponse
+// @Router /v1/admin/user/{id} [delete]
 func (ur *userRoutes) deleteUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -208,6 +283,18 @@ func (ur *userRoutes) deleteUser(ctx *gin.Context) {
 		Message: "OK",
 	})
 }
+
+// createUser godoc
+// @Summary Создать Пользователя
+// @Description Создать Пользователя
+// @Tags admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param body body entity.User true "Create User"
+// @Success 200 {object} entity.CustomResponse
+// @Failure 400 {object} entity.CustomResponse
+// @Router /v1/admin/user/ [post]
 func (ur *userRoutes) createUser(ctx *gin.Context) {
 
 	var user *entity.User
@@ -234,6 +321,16 @@ func (ur *userRoutes) createUser(ctx *gin.Context) {
 	})
 }
 
+// getMe godoc
+// @Summary Получить информацию о себе
+// @Description Получить информацию о себе
+// @Tags cabinet
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} entity.CustomResponseWithData
+// @Failure 400 {object} entity.CustomResponse
+// @Router /v1/user/me/ [get]
 func (ur *userRoutes) getMe(ctx *gin.Context) {
 	user, err := ur.s.GetMe(ctx)
 	if err != nil {
@@ -251,6 +348,17 @@ func (ur *userRoutes) getMe(ctx *gin.Context) {
 	})
 }
 
+// updateMe godoc
+// @Summary Поменять информацию о себе
+// @Description Поменять информацию о себе
+// @Tags cabinet
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param body body entity.User true "Поменять информацию о себе"
+// @Success 200 {object} entity.CustomResponse
+// @Failure 400 {object} entity.CustomResponse
+// @Router /v1/user/me/ [put]
 func (ur *userRoutes) updateMe(ctx *gin.Context) {
 	var newUser *entity.User
 
@@ -275,8 +383,19 @@ func (ur *userRoutes) updateMe(ctx *gin.Context) {
 	})
 }
 
+// searchUser godoc
+// @Summary Поиск пользователя по имени
+// @Description Поиск пользователя по имени
+// @Tags admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param searchQuery query string true "query"
+// @Success 200 {object} entity.CustomResponseWithData
+// @Failure 400 {object} entity.CustomResponse
+// @Router /v1/admin/user/search [get]
 func (ur *userRoutes) searchUser(ctx *gin.Context) {
-	query := ctx.Query("query")
+	query := ctx.Query("searchQuery")
 	users, err := ur.s.SearchUser(ctx, query)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponseWithData{
@@ -305,6 +424,16 @@ func (ur *userRoutes) createUserCode(ctx *gin.Context, id string, wg *sync.WaitG
 	}
 }
 
+// confirmUser godoc
+// @Summary Подтвердить пользователя по коду
+// @Description Подтвердить пользователя по коду
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param inputCode body entity.InputCode true "Код"
+// @Success 200 {object} entity.CustomResponse
+// @Failure 400 {object} entity.CustomResponse
+// @Router /v1/user/confirm/ [post]
 func (ur *userRoutes) confirmUser(ctx *gin.Context) {
 	var code entity.InputCode
 
@@ -327,4 +456,8 @@ func (ur *userRoutes) confirmUser(ctx *gin.Context) {
 		return
 	}
 
+	ctx.JSON(http.StatusOK, &entity.CustomResponse{
+		Status:  0,
+		Message: "User confirmed",
+	})
 }

@@ -6,13 +6,17 @@ import (
 	"crm_system/internal/auth/controller/grpc"
 	middleware2 "crm_system/internal/auth/controller/http/middleware"
 	"crm_system/internal/auth/controller/http/v1"
+	_ "crm_system/internal/auth/docs"
 	repoPkg "crm_system/internal/auth/repository"
 	servicePkg "crm_system/internal/auth/service"
 	"crm_system/internal/kafka"
 	httpserver2 "crm_system/pkg/auth/httpserver"
 	"crm_system/pkg/auth/logger"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"log"
 	"os"
 	"os/signal"
@@ -40,6 +44,14 @@ func Run(cfg *auth.Configuration) {
 	service := servicePkg.New(cfg, repo, userVerificationProducer)
 	middleware := middleware2.New(repo, cfg)
 	handler := gin.Default()
+	handler.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:8081"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type", "Accept-Encoding"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
+	handler.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	grpcService := grpc.NewService(l, repo, cfg)
 	grpcServer := grpc.NewServer(cfg.Grpc.Port, grpcService)

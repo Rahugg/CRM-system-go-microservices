@@ -101,14 +101,42 @@ func (s *Service) returnUsers(ctx *gin.Context, roleId uint) (*[]entity2.SignUpR
 	return &result, nil
 }
 
-func (s *Service) GetUsers(ctx *gin.Context) (*[]entity2.User, error) {
+func (s *Service) GetUsers(ctx *gin.Context, sortBy, sortOrder, age string) (*[]entity2.User, error) {
 	users, err := s.Repo.GetUsers(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if age != "" {
+		users, err = s.filterUsersByAge(users, age)
+	}
 
+	if sortBy != "" {
+		users, err = s.sortUsers(users, sortBy, sortOrder)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return users, nil
+}
+
+func (s *Service) sortUsers(users *[]entity2.User, sortBy, sortOrder string) (*[]entity2.User, error) {
+	users, err := s.Repo.SortUsers(users, sortBy, sortOrder)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+func (s *Service) filterUsersByAge(users *[]entity2.User, age string) (*[]entity2.User, error) {
+	users, err := s.Repo.FilterUsersByAge(users, age)
 	if err != nil {
 		return nil, err
 	}
 	return users, nil
 }
+
 func (s *Service) GetUser(ctx *gin.Context, id string) (*entity2.User, error) {
 	user, err := s.Repo.GetUser(id)
 

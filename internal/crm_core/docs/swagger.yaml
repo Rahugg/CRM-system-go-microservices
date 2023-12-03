@@ -1,0 +1,1116 @@
+definitions:
+  entity.Company:
+    properties:
+      address:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      manager_id:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  entity.Contact:
+    properties:
+      company_id:
+        type: integer
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      phone:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  entity.CustomResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  entity.CustomResponseWithData:
+    properties:
+      data: {}
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  entity.Deal:
+    properties:
+      contact_id:
+        type: integer
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      rep_id:
+        type: integer
+      status:
+        $ref: '#/definitions/entity.StatusDeal'
+      title:
+        type: string
+      updatedAt:
+        type: string
+      value:
+        type: integer
+    type: object
+  entity.NewCompany:
+    properties:
+      address:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  entity.StatusDeal:
+    enum:
+    - INITIATED
+    - IN-PROGRESS
+    - CLOSED-WON
+    - CLOSED-LOST
+    type: string
+    x-enum-varnames:
+    - Initiated
+    - InProgress
+    - ClosedWon
+    - ClosedLost
+  entity.StatusTicket:
+    enum:
+    - OPEN
+    - IN-PROGRESS
+    - CLOSED
+    type: string
+    x-enum-varnames:
+    - Open
+    - InProgressTicket
+    - Closed
+  entity.TaskEditInput:
+    properties:
+      assigned_to:
+        type: string
+      associated_deal_id:
+        type: integer
+      description:
+        type: string
+      due_date:
+        type: string
+      name:
+        type: string
+      state:
+        type: string
+    type: object
+  entity.TaskInput:
+    properties:
+      assigned_to:
+        type: string
+      associated_deal_id:
+        type: integer
+      description:
+        type: string
+      due_date:
+        type: string
+      name:
+        type: string
+      state:
+        type: string
+    type: object
+  entity.Ticket:
+    properties:
+      assigned_to:
+        type: string
+      contact_id:
+        type: integer
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      issue_description:
+        type: string
+      status:
+        $ref: '#/definitions/entity.StatusTicket'
+      updatedAt:
+        type: string
+    type: object
+  entity.VoteInput:
+    properties:
+      task_id:
+        type: integer
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+host: localhost:8082
+info:
+  contact: {}
+  description: crm-core-service
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: crm-core-service
+  version: "1.0"
+paths:
+  /v1/company/:
+    get:
+      consumes:
+      - application/json
+      description: Получить список компаний
+      parameters:
+      - description: sortBy
+        in: query
+        name: sortBy
+        type: string
+      - description: sortOrder
+        in: query
+        name: sortOrder
+        type: string
+      - description: filter by phone
+        in: query
+        name: phone
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить список компаний
+      tags:
+      - company
+    post:
+      consumes:
+      - application/json
+      description: Создать Компанию
+      parameters:
+      - description: Create Company
+        in: body
+        name: companyInput
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Company'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Создать Компанию
+      tags:
+      - company
+  /v1/company/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удалить компанию по id
+      parameters:
+      - description: id company
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Удалить компанию по id
+      tags:
+      - company
+    get:
+      consumes:
+      - application/json
+      description: Получить компанию по id
+      parameters:
+      - description: id company
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить компанию по id
+      tags:
+      - company
+    put:
+      consumes:
+      - application/json
+      description: Редактировать компанию по id
+      parameters:
+      - description: id company
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Company
+        in: body
+        name: inputCompany
+        required: true
+        schema:
+          $ref: '#/definitions/entity.NewCompany'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Редактировать компанию по id
+      tags:
+      - company
+  /v1/company/search:
+    get:
+      consumes:
+      - application/json
+      description: Поиск компании по имени
+      parameters:
+      - description: query
+        in: query
+        name: searchQuery
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Поиск компании по имени
+      tags:
+      - company
+  /v1/contact/:
+    get:
+      consumes:
+      - application/json
+      description: Получить список контактов
+      parameters:
+      - description: sortBy
+        in: query
+        name: sortBy
+        type: string
+      - description: sortOrder
+        in: query
+        name: sortOrder
+        type: string
+      - description: filter by phone
+        in: query
+        name: phone
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить список контактов
+      tags:
+      - contact
+    post:
+      consumes:
+      - application/json
+      description: Создать Контакт
+      parameters:
+      - description: Create Contact
+        in: body
+        name: contactInput
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Contact'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Создать Контакт
+      tags:
+      - contact
+  /v1/contact/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удалить контакт по id
+      parameters:
+      - description: id contact
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Удалить контакт по id
+      tags:
+      - contact
+    get:
+      consumes:
+      - application/json
+      description: Получить контакт по id
+      parameters:
+      - description: id contact
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить контакт по id
+      tags:
+      - contact
+    put:
+      consumes:
+      - application/json
+      description: Редактировать контакт по id
+      parameters:
+      - description: id contact
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Contact
+        in: body
+        name: inputContact
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Contact'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Редактировать контакт по id
+      tags:
+      - contact
+  /v1/contact/search:
+    get:
+      consumes:
+      - application/json
+      description: Поиск контакта по имени
+      parameters:
+      - description: query
+        in: query
+        name: searchQuery
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Поиск контакта по имени
+      tags:
+      - contact
+  /v1/deal/:
+    get:
+      consumes:
+      - application/json
+      description: Получить список соглашений
+      parameters:
+      - description: sortBy
+        in: query
+        name: sortBy
+        type: string
+      - description: sortOrder
+        in: query
+        name: sortOrder
+        type: string
+      - description: filter by status
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить список соглашений
+      tags:
+      - deal
+    post:
+      consumes:
+      - application/json
+      description: Создать Соглашение
+      parameters:
+      - description: Create deal
+        in: body
+        name: dealInput
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Deal'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Создать Соглашение
+      tags:
+      - deal
+  /v1/deal/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удалить соглашение по id
+      parameters:
+      - description: id deal
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Удалить соглашение по id
+      tags:
+      - deal
+    get:
+      consumes:
+      - application/json
+      description: Получить соглашение по id
+      parameters:
+      - description: id deal
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить соглашение по id
+      tags:
+      - deal
+    put:
+      consumes:
+      - application/json
+      description: Редактировать соглашение по id
+      parameters:
+      - description: id deal
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update deal
+        in: body
+        name: newDeal
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Deal'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Редактировать соглашение по id
+      tags:
+      - deal
+  /v1/deal/search:
+    get:
+      consumes:
+      - application/json
+      description: Поиск соглашений по имени
+      parameters:
+      - description: query
+        in: query
+        name: searchQuery
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Поиск соглашений по имени
+      tags:
+      - deal
+  /v1/task/:
+    post:
+      consumes:
+      - application/json
+      description: Создать Задание
+      parameters:
+      - description: Create task
+        in: body
+        name: taskInput
+        required: true
+        schema:
+          $ref: '#/definitions/entity.TaskInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Создать Задание
+      tags:
+      - task
+  /v1/task/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удалить задание по id
+      parameters:
+      - description: id task
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Удалить задание по id
+      tags:
+      - task
+    get:
+      consumes:
+      - application/json
+      description: Получить задание по id
+      parameters:
+      - description: id task
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить задание по id
+      tags:
+      - task
+    put:
+      consumes:
+      - application/json
+      description: Редактировать задание по id
+      parameters:
+      - description: id task
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update task
+        in: body
+        name: inputTask
+        required: true
+        schema:
+          $ref: '#/definitions/entity.TaskEditInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Редактировать задание по id
+      tags:
+      - task
+  /v1/task/changes/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Получить историю изменений по заданию
+      parameters:
+      - description: id task
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить историю изменений по заданию
+      tags:
+      - task
+  /v1/task/deal/{dealId}:
+    get:
+      consumes:
+      - application/json
+      description: Получить список заданий
+      parameters:
+      - description: sortBy
+        in: query
+        name: sortBy
+        type: string
+      - description: sortOrder
+        in: query
+        name: sortOrder
+        type: string
+      - description: filter by state
+        in: query
+        name: state
+        type: string
+      - description: dealId
+        in: path
+        name: dealId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить список заданий
+      tags:
+      - task
+  /v1/task/search:
+    get:
+      consumes:
+      - application/json
+      description: Поиск задание по имени
+      parameters:
+      - description: query
+        in: query
+        name: searchQuery
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Поиск задание по имени
+      tags:
+      - task
+  /v1/task/vote:
+    post:
+      consumes:
+      - application/json
+      description: Проголосовать за задание
+      parameters:
+      - description: Create Vote
+        in: body
+        name: voteInput
+        required: true
+        schema:
+          $ref: '#/definitions/entity.VoteInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Проголосовать за задание
+      tags:
+      - task
+  /v1/ticket/:
+    get:
+      consumes:
+      - application/json
+      description: Получить список билетов
+      parameters:
+      - description: sortBy
+        in: query
+        name: sortBy
+        type: string
+      - description: sortOrder
+        in: query
+        name: sortOrder
+        type: string
+      - description: filter by status
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить список билетов
+      tags:
+      - ticket
+    post:
+      consumes:
+      - application/json
+      description: Создать Билет
+      parameters:
+      - description: Create ticket
+        in: body
+        name: ticketInput
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Ticket'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Создать Билет
+      tags:
+      - ticket
+  /v1/ticket/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удалить билет по id
+      parameters:
+      - description: id ticket
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Удалить билет по id
+      tags:
+      - ticket
+    get:
+      consumes:
+      - application/json
+      description: Получить билет по id
+      parameters:
+      - description: id ticket
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить билет по id
+      tags:
+      - ticket
+    put:
+      consumes:
+      - application/json
+      description: Редактировать билет по id
+      parameters:
+      - description: id ticket
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Ticket
+        in: body
+        name: inputTicket
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Ticket'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Редактировать билет по id
+      tags:
+      - ticket
+  /v1/ticket/search:
+    get:
+      consumes:
+      - application/json
+      description: Поиск билета по имени
+      parameters:
+      - description: query
+        in: query
+        name: searchQuery
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Поиск билета по имени
+      tags:
+      - ticket
+schemes:
+- https
+- http
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
