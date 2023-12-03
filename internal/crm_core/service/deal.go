@@ -5,9 +5,33 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *Service) GetDeals(ctx *gin.Context) (*[]entity.Deal, error) {
+func (s *Service) GetDeals(ctx *gin.Context, sortBy, sortOrder, status string) (*[]entity.Deal, error) {
 	deals, err := s.Repo.GetDeals(ctx)
+	if status != "" {
+		deals, err = s.filterDealsByStatus(deals, status)
+	}
 
+	if sortBy != "" {
+		deals, err = s.sortDeals(deals, sortBy, sortOrder)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return deals, nil
+}
+func (s *Service) sortDeals(deals *[]entity.Deal, sortBy, sortOrder string) (*[]entity.Deal, error) {
+	deals, err := s.Repo.SortDeals(deals, sortBy, sortOrder)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return deals, nil
+}
+
+func (s *Service) filterDealsByStatus(deals *[]entity.Deal, status string) (*[]entity.Deal, error) {
+	deals, err := s.Repo.FilterDealsByStatus(deals, status)
 	if err != nil {
 		return nil, err
 	}
@@ -82,4 +106,13 @@ func (s *Service) DeleteDeal(ctx *gin.Context, id string) error {
 	}
 
 	return nil
+}
+
+func (s *Service) SearchDeal(ctx *gin.Context, query string) (*[]entity.Deal, error) {
+	deals, err := s.Repo.SearchDeal(ctx, query)
+	if err != nil {
+		return deals, err
+	}
+
+	return deals, nil
 }

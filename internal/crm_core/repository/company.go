@@ -47,3 +47,28 @@ func (r *CRMSystemRepo) DeleteCompany(ctx *gin.Context, id string, company *enti
 	}
 	return nil
 }
+func (r *CRMSystemRepo) SearchCompany(ctx *gin.Context, query string) (*[]entity.Company, error) {
+	var companies *[]entity.Company
+
+	if err := r.DB.Where("name ILIKE ?", "%"+query+"%").Find(&companies).Error; err != nil {
+		return nil, err
+	}
+
+	return companies, nil
+}
+
+func (r *CRMSystemRepo) SortCompanies(companies *[]entity.Company, sortBy, sortOrder string) (*[]entity.Company, error) {
+	if err := r.DB.Order(sortBy + " " + sortOrder).Find(&companies).Error; err != nil {
+		return nil, err
+	}
+
+	return companies, nil
+}
+
+func (r *CRMSystemRepo) FilterCompaniesByPhone(companies *[]entity.Company, phone string) (*[]entity.Company, error) {
+	if err := r.DB.Where("phone = ?", phone).Find(&companies).Error; err != nil {
+		return nil, err
+	}
+
+	return companies, nil
+}

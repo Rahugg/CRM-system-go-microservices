@@ -6,14 +6,42 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Service) GetTickets(ctx *gin.Context) (*[]entity.Ticket, error) {
+func (s *Service) GetTickets(ctx *gin.Context, sortBy, sortOrder, status string) (*[]entity.Ticket, error) {
 	tickets, err := s.Repo.GetTickets(ctx)
+	if status != "" {
+		tickets, err = s.filterTicketsByStatus(tickets, status)
+	}
 
+	if sortBy != "" {
+		tickets, err = s.sortTickets(tickets, sortBy, sortOrder)
+		if err != nil {
+			return nil, err
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
 	return tickets, nil
 }
+
+func (s *Service) sortTickets(tickets *[]entity.Ticket, sortBy, sortOrder string) (*[]entity.Ticket, error) {
+	tickets, err := s.Repo.SortTickets(tickets, sortBy, sortOrder)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return tickets, nil
+}
+
+func (s *Service) filterTicketsByStatus(tickets *[]entity.Ticket, status string) (*[]entity.Ticket, error) {
+	tickets, err := s.Repo.FilterTicketsByStatus(tickets, status)
+	if err != nil {
+		return nil, err
+	}
+	return tickets, nil
+}
+
 func (s *Service) GetTicket(ctx *gin.Context, id string) (*entity.Ticket, error) {
 	ticket, err := s.Repo.GetTicket(ctx, id)
 
@@ -79,4 +107,12 @@ func (s *Service) DeleteTicket(ctx *gin.Context, id string) error {
 	}
 
 	return nil
+}
+func (s *Service) SearchTicket(ctx *gin.Context, query string) (*[]entity.Ticket, error) {
+	tickets, err := s.Repo.SearchTicket(ctx, query)
+	if err != nil {
+		return tickets, err
+	}
+
+	return tickets, nil
 }

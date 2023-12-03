@@ -4,6 +4,7 @@ import (
 	"crm_system/config/crm_core"
 	middleware2 "crm_system/internal/crm_core/controller/http/middleware"
 	"crm_system/internal/crm_core/controller/http/v1"
+	_ "crm_system/internal/crm_core/docs"
 	repoPkg "crm_system/internal/crm_core/repository"
 	servicePkg "crm_system/internal/crm_core/service"
 	"crm_system/internal/crm_core/transport"
@@ -11,7 +12,10 @@ import (
 	httpserverPkg "crm_system/pkg/crm_core/httpserver"
 	"crm_system/pkg/crm_core/logger"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"os"
 	"os/signal"
 	"syscall"
@@ -35,6 +39,14 @@ func Run(cfg *crm_core.Configuration) {
 	service := servicePkg.New(cfg, repo, l)
 	middleware := middleware2.New(repo, cfg, validateGrpcTransport)
 	handler := gin.Default()
+	handler.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:8082"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type", "Accept-Encoding"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
+	handler.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	v1.NewRouter(handler, service, middleware, contactCache)
 	httpServer := httpserverPkg.New(handler, cfg, httpserverPkg.Port(cfg.HTTP.Port))

@@ -6,3 +6,6 @@ config/auth/config.yml
 .idea
 
 vendor
+
+docker/data
+docker

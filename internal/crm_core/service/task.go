@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func (s *Service) GetTasks(ctx *gin.Context, dealId string, user *entity.User) ([]map[string]interface{}, error) {
+func (s *Service) GetTasks(ctx *gin.Context, dealId, sortBy, sortOrder, stateInput string, user *entity.User) ([]map[string]interface{}, error) {
 	tasks, err := s.Repo.GetTasksByDealId(dealId)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,35 @@ func (s *Service) GetTasks(ctx *gin.Context, dealId string, user *entity.User) (
 		}
 		columns = append(columns, column)
 	}
+	if stateInput != "" {
+		columns, err = s.filterTasksByStates(columns, stateInput)
+	}
 
+	if sortBy != "" {
+		columns, err = s.sortTasks(columns, sortBy, sortOrder)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return columns, nil
+}
+
+func (s *Service) sortTasks(tasks []map[string]interface{}, sortBy, sortOrder string) ([]map[string]interface{}, error) {
+	tasks, err := s.Repo.SortTasks(tasks, sortBy, sortOrder)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return tasks, nil
+}
+
+func (s *Service) filterTasksByStates(columns []map[string]interface{}, state string) ([]map[string]interface{}, error) {
+	columns, err := s.Repo.FilterTasksByStates(columns, state)
+	if err != nil {
+		return nil, err
+	}
 	return columns, nil
 }
 
@@ -159,6 +187,11 @@ func (s *Service) UpdateTask(ctx *gin.Context, newTask entity.TaskEditInput, id 
 		taskChanges.NewValue = newTask.State
 		task.State = newTask.State
 	}
+
+	if err = s.Repo.CreateTaskChanges(ctx, &taskChanges); err != nil {
+		return err
+	}
+
 	if err = s.Repo.SaveTask(ctx, task); err != nil {
 		return err
 	}
@@ -177,4 +210,12 @@ func (s *Service) DeleteTask(ctx *gin.Context, id string) error {
 	}
 
 	return nil
+}
+func (s *Service) SearchTask(ctx *gin.Context, query string) (*[]entity.Task, error) {
+	tasks, err := s.Repo.SearchTask(ctx, query)
+	if err != nil {
+		return tasks, err
+	}
+
+	return tasks, nil
 }
