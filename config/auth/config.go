@@ -9,14 +9,15 @@ import (
 type (
 	// Configuration -.
 	Configuration struct {
-		App   `yaml:"app"`
-		HTTP  `yaml:"http"`
-		Grpc  `yaml:"Grpc"`
-		Log   `yaml:"logger"`
-		Gin   `yaml:"gin"`
-		DB    `yaml:"db"`
-		Jwt   `yaml:"jwt"`
-		Kafka `yaml:"kafka"`
+		App     `yaml:"app"`
+		HTTP    `yaml:"http"`
+		Grpc    `yaml:"Grpc"`
+		Log     `yaml:"logger"`
+		Gin     `yaml:"gin"`
+		DB      `yaml:"db"`
+		Jwt     `yaml:"jwt"`
+		Kafka   `yaml:"kafka"`
+		Storage `yaml:"Storage"`
 	}
 
 	// App -.
@@ -76,6 +77,11 @@ type (
 	}
 	Consumer struct {
 		Topics []string `yaml:"topics"`
+	}
+
+	Storage struct {
+		Interval        time.Duration `yaml:"Interval"`
+		ShutdownTimeout time.Duration `yaml:"ShutdownTimeout"`
 	}
 )
 

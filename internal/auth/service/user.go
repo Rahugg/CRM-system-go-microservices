@@ -102,7 +102,7 @@ func (s *Service) returnUsers(ctx *gin.Context, roleId uint) (*[]entity2.SignUpR
 }
 
 func (s *Service) GetUsers(ctx *gin.Context, sortBy, sortOrder, age string) (*[]entity2.User, error) {
-	users, err := s.Repo.GetUsers(ctx)
+	users, err := s.Storage.GetAllUsers()
 	if err != nil {
 		return nil, err
 	}
