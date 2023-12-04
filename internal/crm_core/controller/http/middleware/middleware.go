@@ -8,8 +8,6 @@ import (
 	"crm_system/internal/crm_core/transport"
 	pb "crm_system/pkg/auth/authservice/gw"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 	"log"
 	"net/http"
 	"strconv"
@@ -57,20 +55,19 @@ func validBearer(ctx *gin.Context) string {
 	return accessToken
 }
 
-func getUser(resp *pb.ResponseJSON) entity.User {
-	return entity.User{
-		Model:     gorm.Model{},
-		ID:        uuid.UUID{},
-		FirstName: resp.User.FirstName,
-		LastName:  resp.User.LastName,
-		Age:       uint64(resp.User.Age),
-		Phone:     resp.User.Phone,
-		RoleID:    uint(resp.User.RoleID),
-		Role:      entity.Role{},
-		Email:     resp.User.Email,
-		Provider:  resp.User.Provider,
-		Password:  resp.User.Password,
-	}
+func getUser(resp *pb.ResponseJSON) *entity.User {
+	userBuilder := entity.NewUser()
+	user := userBuilder.
+		SetFirstName(resp.User.FirstName).
+		SetLastName(resp.User.LastName).
+		SetAge(uint64(resp.User.Age)).
+		SetPhone(resp.User.Phone).
+		SetRoleID(uint(resp.User.RoleID)).
+		SetEmail(resp.User.Email).
+		SetProvider(resp.User.Provider).
+		SetPassword(resp.User.Password).
+		Build()
+	return &user
 }
 
 func (m *Middleware) DeserializeUser(roles ...string) gin.HandlerFunc {
