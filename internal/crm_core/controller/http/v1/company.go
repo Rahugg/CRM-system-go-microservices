@@ -20,6 +20,8 @@ func newCompanyRoutes(handler *gin.RouterGroup, s *service.Service, MW *middlewa
 	{
 		//middleware for users
 		companyHandler.Use(MW.DeserializeUser("any"))
+		companyHandler.Use(MW.MetricsHandler())
+
 		companyHandler.GET("/", r.getCompanies)
 		companyHandler.GET("/:id", r.getCompany)
 		companyHandler.POST("/", r.createCompany)

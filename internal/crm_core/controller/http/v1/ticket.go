@@ -18,6 +18,7 @@ func newTicketRoutes(handler *gin.RouterGroup, s *service.Service, MW *middlewar
 	ticketHandler := handler.Group("/ticket")
 	{
 		//middleware for users
+		ticketHandler.Use(MW.MetricsHandler())
 		ticketHandler.GET("/", r.getTickets)
 		ticketHandler.GET("/:id", r.getTicket)
 		ticketHandler.POST("/", r.createTicket)

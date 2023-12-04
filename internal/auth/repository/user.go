@@ -67,6 +67,17 @@ func (r *AuthRepo) GetUsers(ctx *gin.Context) (*[]entity.User, error) {
 
 	return users, nil
 }
+
+func (r *AuthRepo) GetAllUsers() (*[]entity.User, error) {
+	var users *[]entity.User
+
+	if err := r.DB.Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
 func (r *AuthRepo) DeleteUser(ctx *gin.Context, id string, user *entity.User) error {
 	if err := r.DB.Where("id = ?", id).Delete(user).Error; err != nil {
 		return err

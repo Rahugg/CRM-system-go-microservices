@@ -20,6 +20,7 @@ func newTaskRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 	taskHandler := handler.Group("/task")
 	{
 		//middleware for users
+		taskHandler.Use(MW.MetricsHandler())
 		taskHandler.GET("/deal/:dealId", MW.DeserializeUser("any"), r.getTasks)
 		taskHandler.GET("/:id", MW.DeserializeUser("any"), r.getTask)
 		taskHandler.POST("/", MW.DeserializeUser("manager", "admin"), r.createTask)

@@ -2,15 +2,21 @@ package repository
 
 import (
 	"crm_system/internal/crm_core/entity"
+	"crm_system/internal/crm_core/metrics"
 	"github.com/gin-gonic/gin"
 )
 
 func (r *CRMSystemRepo) GetTickets(ctx *gin.Context) (*[]entity.Ticket, error) {
 	var tickets *[]entity.Ticket
 
+	ok, fail := metrics.DatabaseQueryTime("GetTickets")
+	defer fail()
+
 	if err := r.DB.Find(&tickets).Error; err != nil {
 		return nil, err
 	}
+
+	ok()
 
 	return tickets, nil
 }

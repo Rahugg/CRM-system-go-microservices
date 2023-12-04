@@ -9,6 +9,7 @@ import (
 	_ "crm_system/internal/auth/docs"
 	repoPkg "crm_system/internal/auth/repository"
 	servicePkg "crm_system/internal/auth/service"
+	storagePkg "crm_system/internal/auth/storage"
 	"crm_system/internal/kafka"
 	httpserver2 "crm_system/pkg/auth/httpserver"
 	"crm_system/pkg/auth/logger"
@@ -26,7 +27,6 @@ import (
 func Run(cfg *auth.Configuration) {
 	l := logger.New(cfg.Gin.Mode)
 	repo := repoPkg.New(cfg, l)
-
 	userVerificationProducer, err := kafka.NewProducer(cfg)
 	if err != nil {
 		l.Fatal("failed NewProducer err: %v", err)
@@ -41,7 +41,11 @@ func Run(cfg *auth.Configuration) {
 
 	go userVerificationConsumer.Start()
 
-	service := servicePkg.New(cfg, repo, userVerificationProducer)
+	storage := storagePkg.NewDataStorage(cfg.Storage.Interval, repo, l)
+	service := servicePkg.New(cfg, repo, userVerificationProducer, storage)
+
+	go storage.Run()
+
 	middleware := middleware2.New(repo, cfg)
 	handler := gin.Default()
 	handler.Use(cors.New(cors.Config{

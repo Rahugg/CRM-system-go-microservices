@@ -3,14 +3,18 @@ package middleware
 import (
 	"crm_system/config/crm_core"
 	"crm_system/internal/crm_core/entity"
+	"crm_system/internal/crm_core/metrics"
 	"crm_system/internal/crm_core/repository"
 	"crm_system/internal/crm_core/transport"
+	pb "crm_system/pkg/auth/authservice/gw"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type Middleware struct {
@@ -37,19 +41,43 @@ func (m *Middleware) CustomLogger() gin.HandlerFunc {
 	}
 }
 
+func validBearer(ctx *gin.Context) string {
+	var accessToken string
+
+	cookie, err := ctx.Cookie("access_token")
+	authorizationHeader := ctx.Request.Header.Get("Authorization")
+	fields := strings.Fields(authorizationHeader)
+
+	if len(fields) != 0 && fields[0] == "Bearer" {
+		accessToken = fields[1]
+	} else if err == nil {
+		accessToken = cookie
+	}
+
+	return accessToken
+}
+
+func getUser(resp *pb.ResponseJSON) entity.User {
+	return entity.User{
+		Model:     gorm.Model{},
+		ID:        uuid.UUID{},
+		FirstName: resp.User.FirstName,
+		LastName:  resp.User.LastName,
+		Age:       uint64(resp.User.Age),
+		Phone:     resp.User.Phone,
+		RoleID:    uint(resp.User.RoleID),
+		Role:      entity.Role{},
+		Email:     resp.User.Email,
+		Provider:  resp.User.Provider,
+		Password:  resp.User.Password,
+	}
+}
+
 func (m *Middleware) DeserializeUser(roles ...string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var accessToken string
 
-		cookie, err := ctx.Cookie("access_token")
-		authorizationHeader := ctx.Request.Header.Get("Authorization")
-		fields := strings.Fields(authorizationHeader)
-
-		if len(fields) != 0 && fields[0] == "Bearer" {
-			accessToken = fields[1]
-		} else if err == nil {
-			accessToken = cookie
-		}
+		accessToken = validBearer(ctx)
 
 		if accessToken == "" {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, &entity.CustomResponse{
@@ -67,22 +95,26 @@ func (m *Middleware) DeserializeUser(roles ...string) gin.HandlerFunc {
 			})
 			return
 		}
-		user := &entity.User{
-			Model:     gorm.Model{},
-			ID:        uuid.UUID{},
-			FirstName: resp.User.FirstName,
-			LastName:  resp.User.LastName,
-			Age:       uint64(resp.User.Age),
-			Phone:     resp.User.Phone,
-			RoleID:    uint(resp.User.RoleID),
-			Role:      entity.Role{},
-			Email:     resp.User.Email,
-			Provider:  resp.User.Provider,
-			Password:  resp.User.Password,
-		}
+
+		user := getUser(resp)
+
 		ctx.Set("currentUser", user)
 		ctx.Set("currentRole", resp.Role)
 		ctx.Next()
+	}
+}
 
+func (m *Middleware) MetricsHandler() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		start := time.Now()
+
+		ctx.Next()
+
+		path := ctx.Request.URL.Path
+
+		statusString := strconv.Itoa(ctx.Writer.Status())
+
+		metrics.HttpResponseTime.WithLabelValues(path, statusString, ctx.Request.Method).Observe(time.Since(start).Seconds())
+		metrics.HttpRequestsTotalCollector.WithLabelValues(path, statusString, ctx.Request.Method).Inc()
 	}
 }
