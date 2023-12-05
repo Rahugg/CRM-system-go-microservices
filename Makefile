@@ -18,10 +18,6 @@ compose-down: ### Down docker-compose
 	docker-compose down --remove-orphans
 .PHONY: compose-down
 
-docker-rm-volume: ### remove docker volume
-	docker volume rm go-clean-template_pg-data
-.PHONY: docker-rm-volume
-
 mock-data: ### run mockgen
 	go run migrations/crm_mock/crm_mock.go && go run migrations/auth_mock/auth_mock.go
 .PHONY: mock
@@ -58,3 +54,7 @@ swag-auth:
 swag-crm:
 	cd internal/crm_core && swag init --parseDependency --parseInternal -g ../../cmd/crm_core/main.go
 ./PHONY: swag-crm
+
+gen-proto:
+	protoc --go_out ./gw --go_opt paths=source_relative --go-grpc_out ./gw --go-grpc_opt paths=source_relative --grpc-gateway_out=./gw --grpc-gateway_opt logtostderr=true --grpc-gateway_opt generate_unbound_methods=true --proto_path=../../ --proto_path=./ auth.proto
+./PHONY: gen-proto

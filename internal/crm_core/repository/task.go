@@ -105,14 +105,6 @@ func (r *CRMSystemRepo) SearchTask(ctx *gin.Context, query string) (*[]entity.Ta
 	return tasks, nil
 }
 
-func (r *CRMSystemRepo) SortTasks(tasks []map[string]interface{}, sortBy, sortOrder string) ([]map[string]interface{}, error) {
-	if err := r.DB.Order(sortBy + " " + sortOrder).Find(&tasks).Error; err != nil {
-		return nil, err
-	}
-
-	return tasks, nil
-}
-
 func (r *CRMSystemRepo) FilterTasksByStates(tasks []map[string]interface{}, state string) ([]map[string]interface{}, error) {
 	if err := r.DB.Where("state = ?", state).Find(&tasks).Error; err != nil {
 		return nil, err
