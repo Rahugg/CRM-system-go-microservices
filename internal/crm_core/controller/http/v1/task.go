@@ -61,7 +61,7 @@ func (tr *taskRoutes) getTasks(ctx *gin.Context) {
 		return
 	}
 
-	tasks, err := tr.s.GetTasks(ctx, dealId, sortBy, sortOrder, state, user)
+	tasks, err := tr.s.GetTasks(dealId, sortBy, sortOrder, state, user)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
@@ -175,7 +175,7 @@ func (tr *taskRoutes) vote(ctx *gin.Context) {
 		return
 	}
 
-	err := tr.s.Vote(ctx, user, voteInput)
+	err := tr.s.Vote(user, voteInput)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, &entity.CustomResponse{
 			Status:  -2,

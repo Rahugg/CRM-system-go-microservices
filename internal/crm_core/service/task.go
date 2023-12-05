@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func (s *Service) GetTasks(ctx *gin.Context, dealId, sortBy, sortOrder, stateInput string, user *entity.User) ([]map[string]interface{}, error) {
+func (s *Service) GetTasks(dealId, sortBy, sortOrder, stateInput string, user *entity.User) ([]map[string]interface{}, error) {
 	tasks, err := s.Repo.GetTasksByDealId(dealId)
 	if err != nil {
 		return nil, err
@@ -39,36 +39,90 @@ func (s *Service) GetTasks(ctx *gin.Context, dealId, sortBy, sortOrder, stateInp
 		}
 		columns = append(columns, column)
 	}
-	if stateInput != "" {
-		columns, err = s.filterTasksByStates(columns, stateInput)
-	}
 
 	if sortBy != "" {
-		columns, err = s.sortTasks(columns, sortBy, sortOrder)
+		columns, err = s.sortTasks(columns, sortBy, sortOrder, stateInput)
 		if err != nil {
 			return nil, err
 		}
 	}
 
+	if stateInput != "" && sortBy == "" && sortOrder == "" {
+		column, err := s.filterTasksByStates(columns, stateInput)
+		if err != nil {
+			return nil, err
+		}
+		columns = nil
+		columns = append(columns, column)
+	}
+
 	return columns, nil
 }
 
-func (s *Service) sortTasks(tasks []map[string]interface{}, sortBy, sortOrder string) ([]map[string]interface{}, error) {
-	tasks, err := s.Repo.SortTasks(tasks, sortBy, sortOrder)
+type CompareFunc[T any] func(i, j T) bool
 
-	if err != nil {
-		return nil, err
-	}
-
-	return tasks, nil
+func SortByField[T any](items []T, less CompareFunc[T]) {
+	sort.Slice(items, func(i, j int) bool {
+		return less(items[i], items[j])
+	})
 }
 
-func (s *Service) filterTasksByStates(columns []map[string]interface{}, state string) ([]map[string]interface{}, error) {
-	columns, err := s.Repo.FilterTasksByStates(columns, state)
-	if err != nil {
-		return nil, err
+func TaskComparison(i, j entity.TaskResult, sortBy string) bool {
+	switch sortBy {
+	case "name":
+		return i.Task.Name < j.Task.Name
+	case "description":
+		return i.Task.Description < j.Task.Description
+	default:
+		return i.Task.DueDate.Before(j.Task.DueDate)
 	}
+}
+
+func (s *Service) sortTasks(columns []map[string]interface{}, sortBy, sortOrder, state string) ([]map[string]interface{}, error) {
+	var tasks []entity.TaskResult
+	for _, column := range columns {
+		if column["id"] == state {
+			tasks = column["tasks"].([]entity.TaskResult)
+			break
+		}
+	}
+
+	less := func(i, j entity.TaskResult) bool {
+		return TaskComparison(i, j, sortBy)
+	}
+
+	SortByField(tasks, less)
+
+	if sortOrder == "desc" {
+		sort.SliceStable(tasks, func(i, j int) bool {
+			return !less(tasks[i], tasks[j])
+		})
+	}
+
+	columns = getColumns(columns, sortBy, tasks)
+
 	return columns, nil
+}
+
+func getColumns(columns []map[string]interface{}, sortBy string, tasks []entity.TaskResult) []map[string]interface{} {
+	for i, column := range columns {
+		if column["id"] == sortBy {
+			columns[i]["tasks"] = tasks
+			break
+		}
+	}
+	return columns
+}
+
+func (s *Service) filterTasksByStates(columns []map[string]interface{}, state string) (map[string]interface{}, error) {
+	var response map[string]interface{}
+	for _, column := range columns {
+		if column["id"] == state {
+			response = column
+			break
+		}
+	}
+	return response, nil
 }
 
 func appendTasks(tasks []entity.Task, user *entity.User, dashboardTodos map[string][]entity.TaskResult) map[string][]entity.TaskResult {
@@ -117,7 +171,7 @@ func (s *Service) CreateTask(ctx *gin.Context, task *entity.TaskInput) error {
 	return nil
 }
 
-func (s *Service) Vote(ctx *gin.Context, user *entity.User, voteInput *entity.VoteInput) error {
+func (s *Service) Vote(user *entity.User, voteInput *entity.VoteInput) error {
 	if err := s.Repo.CreateVote(user, voteInput); err != nil {
 		return err
 	}
