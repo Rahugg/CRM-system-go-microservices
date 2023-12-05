@@ -27,6 +27,7 @@ type (
 	// HTTP -.
 	HTTP struct {
 		Port                   string `env-required:"true" yaml:"port" env:"HTTP_PORT"`
+		DebugPort              string `env-required:"true" yaml:"debugPort" env:"HTTP_DEBUG_PORT"`
 		DefaultReadTimeout     int64  `env-required:"true" yaml:"default_read_timeout" env:"DEFAULT_READ_TIMEOUT"`
 		DefaultWriteTimeout    int64  `env-required:"true" yaml:"default_write_timeout" env:"DEFAULT_WRITE_TIMEOUT"`
 		DefaultShutdownTimeout int64  `env-required:"true" yaml:"default_shutdown_timeout" env:"DEFAULT_SHUTDOWN_TIMEOUT"`
