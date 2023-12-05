@@ -44,6 +44,9 @@ func (s *Service) SignUp(ctx *gin.Context, payload *entity2.SignUpInput, roleId 
 		return "", err
 	}
 	userResponse, err := s.Repo.GetUserByEmail(ctx, user.Email)
+	if err != nil {
+		return "", err
+	}
 
 	return userResponse.ID.String(), nil
 }
@@ -78,36 +81,16 @@ func (s *Service) SignIn(ctx *gin.Context, payload *entity2.SignInInput) (*entit
 	return &data, nil
 }
 
-func (s *Service) returnUsers(ctx *gin.Context, roleId uint) (*[]entity2.SignUpResult, error) {
-	users, err := s.Repo.GetUsersByRole(ctx, roleId)
-	if err != nil {
-		return nil, err
-	}
-
-	result := make([]entity2.SignUpResult, len(*users))
-
-	for i, user := range *users {
-		result[i] = entity2.SignUpResult{
-			ID:        user.ID,
-			FirstName: user.FirstName,
-			LastName:  user.LastName,
-			Email:     user.Email,
-			Role:      user.Role.Name,
-			Provider:  user.Provider,
-			CreatedAt: user.CreatedAt,
-			UpdatedAt: user.UpdatedAt,
-		}
-	}
-	return &result, nil
-}
-
-func (s *Service) GetUsers(ctx *gin.Context, sortBy, sortOrder, age string) (*[]entity2.User, error) {
+func (s *Service) GetUsers(sortBy, sortOrder, age string) (*[]entity2.User, error) {
 	users, err := s.Storage.GetAllUsers()
 	if err != nil {
 		return nil, err
 	}
 	if age != "" {
 		users, err = s.filterUsersByAge(users, age)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if sortBy != "" {
@@ -137,7 +120,7 @@ func (s *Service) filterUsersByAge(users *[]entity2.User, age string) (*[]entity
 	return users, nil
 }
 
-func (s *Service) GetUser(ctx *gin.Context, id string) (*entity2.User, error) {
+func (s *Service) GetUser(id string) (*entity2.User, error) {
 	user, err := s.Repo.GetUser(id)
 
 	if err != nil {
@@ -153,7 +136,7 @@ func (s *Service) CreateUser(ctx *gin.Context, user *entity2.User) error {
 
 	return nil
 }
-func (s *Service) UpdateUser(ctx *gin.Context, newUser *entity2.User, id string) error {
+func (s *Service) UpdateUser(newUser *entity2.User, id string) error {
 	user, err := s.Repo.GetUser(id)
 	if err != nil {
 		return err
@@ -271,7 +254,7 @@ func (s *Service) SearchUser(ctx *gin.Context, query string) (*[]entity2.User, e
 	return users, nil
 }
 
-func (s *Service) CreateUserCode(ctx *gin.Context, id string) error {
+func (s *Service) CreateUserCode(id string) error {
 	randNum1 := rand.Intn(999-100) + 100
 	randNum2 := rand.Intn(999-100) + 100
 
@@ -291,7 +274,7 @@ func (s *Service) CreateUserCode(ctx *gin.Context, id string) error {
 
 }
 
-func (s *Service) ConfirmUser(ctx *gin.Context, code string) error {
+func (s *Service) ConfirmUser(code string) error {
 	err := s.Repo.ConfirmUser(code)
 	if err != nil {
 		return err

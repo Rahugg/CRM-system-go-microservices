@@ -58,7 +58,7 @@ func (c *Consumer) Start() {
 			continue
 		}
 
-		c.logger.Info(" Start consuming topic ", topic)
+		c.logger.Info("Start consuming topic %s", topic)
 
 		go func(topic string, consumer sarama.PartitionConsumer) {
 			for {

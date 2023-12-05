@@ -58,3 +58,7 @@ swag-crm:
 gen-proto:
 	protoc --go_out ./gw --go_opt paths=source_relative --go-grpc_out ./gw --go-grpc_opt paths=source_relative --grpc-gateway_out=./gw --grpc-gateway_opt logtostderr=true --grpc-gateway_opt generate_unbound_methods=true --proto_path=../../ --proto_path=./ auth.proto
 ./PHONY: gen-proto
+
+linter-go:
+	golangci-lint run
+./PHONY: linter-go

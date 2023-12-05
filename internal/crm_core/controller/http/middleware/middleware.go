@@ -72,9 +72,7 @@ func getUser(resp *pb.ResponseJSON) *entity.User {
 
 func (m *Middleware) DeserializeUser(roles ...string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var accessToken string
-
-		accessToken = validBearer(ctx)
+		accessToken := validBearer(ctx)
 
 		if accessToken == "" {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, &entity.CustomResponse{

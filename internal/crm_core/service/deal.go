@@ -7,8 +7,15 @@ import (
 
 func (s *Service) GetDeals(ctx *gin.Context, sortBy, sortOrder, status string) (*[]entity.Deal, error) {
 	deals, err := s.Repo.GetDeals(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	if status != "" {
 		deals, err = s.filterDealsByStatus(deals, status)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if sortBy != "" {

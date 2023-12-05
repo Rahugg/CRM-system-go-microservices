@@ -12,6 +12,9 @@ func (s *Service) GetCompanies(ctx *gin.Context, sortBy, sortOrder, phone string
 	}
 	if phone != "" {
 		companies, err = s.filterCompaniesByPhone(companies, phone)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if sortBy != "" {
