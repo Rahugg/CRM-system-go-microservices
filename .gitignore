@@ -9,3 +9,6 @@ vendor
 
 docker/data
 docker
+
+data/kafka1
+data/zookeeper
