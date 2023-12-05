@@ -169,7 +169,7 @@ func (ur *userRoutes) getUsers(ctx *gin.Context) {
 	sortOrder := ctx.Query("sortOrder")
 	age := ctx.Query("age")
 
-	users, err := ur.s.GetUsers(ctx, sortBy, sortOrder, age)
+	users, err := ur.s.GetUsers(sortBy, sortOrder, age)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
@@ -200,7 +200,7 @@ func (ur *userRoutes) getUsers(ctx *gin.Context) {
 func (ur *userRoutes) getUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	user, err := ur.s.GetUser(ctx, id)
+	user, err := ur.s.GetUser(id)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
@@ -242,7 +242,7 @@ func (ur *userRoutes) updateUser(ctx *gin.Context) {
 		return
 	}
 
-	if err := ur.s.UpdateUser(ctx, newUser, id); err != nil {
+	if err := ur.s.UpdateUser(newUser, id); err != nil {
 		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
 			Status:  -2,
 			Message: err.Error(),
@@ -414,7 +414,7 @@ func (ur *userRoutes) searchUser(ctx *gin.Context) {
 
 func (ur *userRoutes) createUserCode(ctx *gin.Context, id string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	err := ur.s.CreateUserCode(ctx, id)
+	err := ur.s.CreateUserCode(id)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
 			Status:  -1,
@@ -446,7 +446,7 @@ func (ur *userRoutes) confirmUser(ctx *gin.Context) {
 		return
 	}
 
-	err = ur.s.ConfirmUser(ctx, code.Code)
+	err = ur.s.ConfirmUser(code.Code)
 	if err != nil {
 		ur.l.Error(err.Error())
 		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
