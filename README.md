@@ -1,7 +1,7 @@
 
 <a name="readme-top"></a>
 
-
+[![MIT License][license-shield]][license-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
@@ -241,14 +241,12 @@ Project Link: [https://github.com/Rahugg/CRM-system-go-microservices](https://gi
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/Rahugg/CRM-system-go-microservices.svg?style=for-the-badge
-[contributors-url]: https://github.com/Rahugg/CRM-system-go-microservices/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/Rahugg/CRM-system-go-microservices.svg?style=for-the-badge
 [forks-url]: https://github.com/Rahugg/CRM-system-go-microservices/network/members  
 [stars-shield]: https://img.shields.io/github/stars/Rahugg/CRM-system-go-microservices.svg?style=for-the-badge
 [stars-url]: https://github.com/Rahugg/CRM-system-go-microservices/stargazers
-[issues-shield]: https://img.shields.io/github/issues/Rahugg/CRM-system-go-microservices.svg?style=for-the-badge
-[issues-url]: https://github.com/Rahugg/CRM-system-go-microservices/issues
+[license-shield]: https://img.shields.io/github/license/Rahugg/CRM-system-go-microservices.svg?style=for-the-badge
+[license-url]: https://github.com/Rahugg/CRM-system-go-microservices/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/amanbek-faizolla
 [Golang-badge]: https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white
