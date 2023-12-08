@@ -1,0 +1,48 @@
+app:
+  name: 'auth_service'
+  version: '1.0.0'
+
+http:
+  port: '8081'
+  default_read_timeout: 5
+  default_write_timeout: 5
+  default_shutdown_timeout: 5
+
+Grpc:
+  Port: ":9090"
+
+log:
+  level: 'debug'
+
+gin:
+  mode: 'debug'
+
+db:
+  pool_max: 2
+  host: 'localhost'
+  user: 'postgres'
+  password: 'postgres'
+  name: 'postgres'
+  port: 5432
+
+jwt:
+  access_private_key: private_key
+  access_public_key: private_key
+  access_token_expired_in: 60m
+  access_token_max_age: 60m
+
+  refresh_private_key: rahug
+  refresh_public_key: rahug
+  refresh_token_expired_in: 1440m
+  refresh_token_max_age: 1440
+Kafka:
+  Brokers:
+    - 127.0.0.1:19092
+  Producer:
+    topic: "user-verification"
+  Consumer:
+    topics:
+      - "user-verification"
+Storage:
+  Interval: 10s
+  ShutdownTimeout: 1m
