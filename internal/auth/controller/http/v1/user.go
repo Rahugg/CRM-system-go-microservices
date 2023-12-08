@@ -158,9 +158,9 @@ func (ur *userRoutes) logout(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param sortBy query string true "sortBy"
-// @Param sortOrder query string true "sortOrder"
-// @Param age query string true "filter by age"
+// @Param sortBy query string false "sortBy"
+// @Param sortOrder query string false "sortOrder"
+// @Param age query string false "filter by age"
 // @Success 200 {object} entity.CustomResponseWithData
 // @Failure 400 {object} entity.CustomResponse
 // @Router /v1/admin/user/ [get]

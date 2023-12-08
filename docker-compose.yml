@@ -58,13 +58,17 @@ services:
       - ./pkg/crm_core/grafana/provisioning:/etc/grafana/provisioning
       - ./pkg/crm_core/grafana/dashboards:/var/lib/grafana/dashboards
 
-  auth-service:
+  auth:
+    build:
+      context: .
+      dockerfile: dockerfile-auth
+    container_name: auth-service
     image: auth-service
-    container_name: as-auth
     depends_on:
       - postgres-auth
       - redis
       - zookeeper
+
   postgres-auth:
     image: postgres:14-alpine
     container_name: as-auth-db
@@ -77,18 +81,23 @@ services:
       - '5432:5432'
     volumes:
       - postgres-auth:/var/lib/postgresql/data
-  crm-service:
+
+  crm:
+    build:
+      context: .
+      dockerfile: dockerfile-crm
+    container_name: crm-service
     image: crm-service
-    container_name: cs-crm
     depends_on:
       - postgres-crm
       - redis
+
   postgres-crm:
     image: postgres:14-alpine
     container_name: cs-crm-db
     restart: always
     environment:
-      POSTGRES_DB: crm_system
+      POSTGRES_DB: crm_service
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 12345
     ports:
@@ -101,6 +110,7 @@ services:
     image: redis
     ports:
       - '6379:6379'
+
 volumes:
   postgres-auth:
     driver: local

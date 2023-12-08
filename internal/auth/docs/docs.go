@@ -38,6 +38,26 @@ const docTemplate = `{
                     "admin"
                 ],
                 "summary": "Получить список пользователей",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "sortBy",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "sortOrder",
+                        "name": "sortOrder",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "filter by age",
+                        "name": "age",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -586,9 +606,6 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "last_name": {
-                    "type": "string"
-                },
-                "password": {
                     "type": "string"
                 },
                 "phone": {

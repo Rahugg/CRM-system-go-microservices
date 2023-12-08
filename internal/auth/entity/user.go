@@ -16,7 +16,7 @@ type User struct {
 	Role        Role      `gorm:"not null" json:"role"`
 	Email       string    `gorm:"type:varchar(255);not null;uniqueIndex;not null" json:"email"`
 	Provider    string    `gorm:"type:varchar(255);not null" json:"provider"`
-	Password    string    `gorm:"type:varchar(255);not null" json:"password"`
+	Password    string    `gorm:"type:varchar(255);not null" json:"-"`
 	IsConfirmed bool      `json:"is_confirmed"`
 }
 
