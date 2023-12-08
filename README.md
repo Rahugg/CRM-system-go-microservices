@@ -1,12 +1,10 @@
-# 
-<a name="readme-top"></a>
 
+<a name="readme-top"></a>
 
 
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
 
@@ -15,7 +13,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/Rahugg/CRM-system-go-microservices">
-    <img src="pkg\crm_core\img\crm-icon.png" alt="Logo" width="80" height="80">
+    <img src="pkg/crm_core/img/crm-icon.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">CRM-system-go-microservices</h3>
@@ -28,52 +26,167 @@
 
 
 <!-- TABLE OF CONTENTS -->
-<details>
   <summary>Table of Contents</summary>
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
         <li><a href="#built-with">Built With</a></li>
+        <li><a href="#tech-features">Tech features</a></li>
       </ul>
-      </li>
-      <li><a href="#installation">Getting started</a></li>
-   <li><a href="#contact">Contact</a></li>
+    </li>
+     <li>
+      <a href="#architecture-of-project">Architecture of project</a>
+    </li>
+    <li>
+      <a href="#detailed">Detailed Architecture</a>
+    </li>
+    <li>
+        <a href="#installation">Getting started</a>
+        <ul>
+          <li><a href="#launch">How to launch the service</a></li>
+          <li><a href="#migrate">How to migrate the mock data</a></li>
+        </ul>
+    </li>
+    <li>
+     <a href="#contact">Contact</a>
+    </li>
+    <li>
+      <a href="#reasons-why-i-used-these-technologies">Reasons of using these Technologies</a>
+    </li>
+    
   </ol>
-</details>
 
 
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
- Simple Customer Relationship Management helps to manage tasks, assign deadlines, control user roles, use of admin panel, feedback management, sales representation, deal management
+Customer Relationship Management 
+### My application's features:
+<ul>
+  <li>Assign deadlines</li>
+  <li>Contact management</li>
+  <li>Control user roles</li>
+  <li>Deal management</li>
+  <li>Feedback management</li>
+  <li>Helps to manage tasks</li>
+  <li>Monitor the metrics</li>
+  <li>Sales representation</li>
+  <li>Use of admin panel</li>
+</ul>
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-
-### Built With
-
-* [![Golang][Golang-badge]][Golang-url]
+## Built With
+* [![Golang][Golang-badge]][Golang-url] 
 * [![Gin][Gin-badge]][Gin-url]
-* [![PostgreSQL][PostgreSQL-badge]][PostgreSQL-url]
-* [![Redis][Redis-badge]][Redis-url]
-* [![Kafka][Kafka-badge]][Kafka-url]
 * [![gRPC][gRPC-badge]][gRPC-url]
-* [![Docker][Docker-badge]][Docker-url]
-* [![Swagger][Swagger-badge]][Swagger-url]
+* [![PostgreSQL][PostgreSQL-badge]][PostgreSQL-url] 
+* [![Redis][Redis-badge]][Redis-url] 
+* [![Kafka][Kafka-badge]][Kafka-url] 
+* [![Docker][Docker-badge]][Docker-url] 
+* [![Swagger][Swagger-badge]][Swagger-url] 
 * [![Grafana][Grafana-badge]][Grafana-url]
 * [![Prometheus][Prometheus-badge]][Prometheus-url]
 
+## Tech features
+* Concurrency
+* Design Patterns
+* Docker
+* gRPC
+* JWT Auth
+* Kafka
+* Linters
+* Migrations
+* Metrics Grafana/Prometheus
+* Middleware
+* PostgreSQL
+* Redis
+* RESTful APIs
+* Swagger
+* Viper Config
+  
+## [Architecture of project](pkg/crm_core/img/architecture-of-project.png)
+## [Detailed](pkg/crm_core/img/detailed-architecture.png)
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
+  
+## Reasons why I used these technologies 
+<summary>Technologies</summary>
+  <ul>
+    <li>
+      <details>
+        <summary>Golang</summary>
+        I used Golang as a main backend language. And I wrote a backend by using Gin framework, It was easy to learn and write code in it, and Golang helped me to deal with concurrency. 
+        Features where I used concurrency:
+        * Graceful Shutdown
+        * Kafka producer-consumer relation
+        * User confirm.
+        * In-memory caching
+      </details>
+    </li>
+     <li>
+      <details>
+        <summary>PostgreSQL</summary>
+        As a main database storage. Because of their open-source and availability, I preffered to use this database. Relational Database helped me to build relations among the entities, and it helped
+        to build an application structured around a relationship between data tables.
+      </details>
+    </li>
+     <li>
+      <details>
+        <summary>Redis</summary>
+        As a NoSQL database, I used Redis to cache the most used and unchanged data, and this helped me to retrieve the data faster.
+        This provides improved read performance (as requests can be split among the servers) and faster recovery when the primary server experiences an outage
+      </details>
+    </li>
+      <li>
+      <details>
+        <summary>Kafka</summary>
+        I used Kafka as a message broker. Because Kafka streams messages with very low latency and is suitable to analyze streaming data in real time. 
+        It can be used as a monitoring service to raise alerts and etc.
+        Kafka is suitable for my app that need to reanalyze the received data
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>gRPC</summary>
+         gRPC uses a binary format for data serialization and communication, which is much more efficient than traditional text-based formats such as JSON or XML. 
+        This results in faster and more efficient communication between microservices.
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>Docker</summary>
+         Docker helps to containerize the application which can help to easy-sharing among the users and by installing some dependencies such as Redis and Kafka to project.
+         Docker lets you build, test, and deploy applications quickly
+         Because Docker containers encapsulate everything an application needs to run (and only those things), they allow applications to be shuttled easily between environments.
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>Swagger</summary>
+        Swagger allowed me to describe the structure of my APIs so that machines can read them. The ability of APIs to describe their own structure is the root of all awesomeness in Swagger.
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>Grafana</summary>
+         Grafana helps me to visualize the data and monitor the proccess of my app, I collect the metrics from Prometheus and visualizing them in Grafana on localhost:3000
+      </details>
+    </li>
+     <li>
+      <details>
+        <summary>Prometheus</summary>
+        Prometheus can collect and store metrics as time-series data, recording information with a timestamp, and I am visualizing them in Grafana
+      </details>
+    </li>
+  </ul>
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-
-### Installation
+## Installation
 
 2. Clone the repo
    ```sh
@@ -90,11 +203,32 @@
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- LICENSE -->
-## License
-
-Distributed under the MIT License. See `LICENSE.txt` for more information.
-
+## Launch
+  1. To launch the auth-service: (make sure that the docker-compose is up) 
+  ```
+    make start-auth
+  ```
+  (Check makefile for other scripts)
+  <br/>
+  2. To launch the crm_core service: (make sure that the docker-compose is up)
+  ```
+    make start-crm
+  ```
+  (Check makefile for other scripts)
+  
+## Migrate
+  1. To migrate the data and tables on services:(Check makefile for other scripts)
+  ```
+    make migrate-up
+  ```
+  2. To mock the database with mock data:(Check makefile for other scripts)
+  ```
+    make mock-data
+  ```
+  3. To drop all of the tables:
+  ```
+    make migrate-down
+  ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
@@ -118,11 +252,8 @@ Project Link: [https://github.com/Rahugg/CRM-system-go-microservices](https://gi
 [stars-url]: https://github.com/Rahugg/CRM-system-go-microservices/stargazers
 [issues-shield]: https://img.shields.io/github/issues/Rahugg/CRM-system-go-microservices.svg?style=for-the-badge
 [issues-url]: https://github.com/Rahugg/CRM-system-go-microservices/issues
-[license-shield]: https://img.shields.io/github/license/Rahugg/CRM-system-go-microservices.svg?style=for-the-badge
-[license-url]: https://github.com/Rahugg/CRM-system-go-microservices/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/amanbek-faizolla
-[product-screenshot]: images/screenshot.png
 [Golang-badge]: https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white
 [Golang-url]: https://golang.org/
 [Gin-badge]: https://img.shields.io/badge/Gin-00ADD8?style=for-the-badge&logo=go&logoColor=white
