@@ -185,7 +185,7 @@ Customer Relationship Management
 
 2. Clone the repo
    ```sh
-   https://github.com/Rahugg/CRM-system-go-microservices.git
+   git clone https://github.com/Rahugg/CRM-system-go-microservices.git
    ```
 3. Install go packages
    ```sh
