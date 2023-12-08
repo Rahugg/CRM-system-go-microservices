@@ -245,7 +245,7 @@ Project Link: [https://github.com/Rahugg/CRM-system-go-microservices](https://gi
 [forks-url]: https://github.com/Rahugg/CRM-system-go-microservices/network/members  
 [stars-shield]: https://img.shields.io/github/stars/Rahugg/CRM-system-go-microservices.svg?style=for-the-badge
 [stars-url]: https://github.com/Rahugg/CRM-system-go-microservices/stargazers
-[license-shield]: https://img.shields.io/github/license/Rahugg/CRM-system-go-microservices.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/badge/license-MIT-blue
 [license-url]: https://github.com/Rahugg/CRM-system-go-microservices/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/amanbek-faizolla
