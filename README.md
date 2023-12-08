@@ -106,11 +106,6 @@ Customer Relationship Management
 * Swagger
 * Viper Config
   
-## [Architecture of project](pkg/crm_core/img/architecture-of-project.png)
-## [Detailed](pkg/crm_core/img/detailed-architecture.png)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-  
 ## Reasons why I used these technologies 
 <summary>Technologies</summary>
   <ul>
@@ -232,6 +227,9 @@ Customer Relationship Management
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
+  
+## [Architecture of project](pkg/crm_core/img/architecture-of-project.png)
+## [Detailed](pkg/crm_core/img/detailed-architecture.png)
 
 <!-- CONTACT -->
 ## Contact
