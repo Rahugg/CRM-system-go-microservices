@@ -76,8 +76,6 @@ definitions:
         type: boolean
       last_name:
         type: string
-      password:
-        type: string
       phone:
         type: string
       provider:
@@ -113,6 +111,19 @@ paths:
       consumes:
       - application/json
       description: Получить список пользователей
+      parameters:
+      - description: sortBy
+        in: query
+        name: sortBy
+        type: string
+      - description: sortOrder
+        in: query
+        name: sortOrder
+        type: string
+      - description: filter by age
+        in: query
+        name: age
+        type: string
       produces:
       - application/json
       responses:
