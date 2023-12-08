@@ -36,17 +36,9 @@
       <ul>
         <li><a href="#built-with">Built With</a></li>
       </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#contact">Contact</a></li>
+      </li>
+      <li><a href="#installation">Getting started</a></li>
+   <li><a href="#contact">Contact</a></li>
   </ol>
 </details>
 
@@ -110,16 +102,11 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@telegram_handle](https://t.me/Rahuggg) - Rahuggg
+Amanbek - [@telegram_handle](https://t.me/Rahuggg) - Rahuggg
 
 Project Link: [https://github.com/Rahugg/CRM-system-go-microservices](https://github.com/Rahugg/CRM-system-go-microservices)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
