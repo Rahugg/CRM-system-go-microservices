@@ -1,21 +1,19 @@
-package app
+package main
 
 import (
+	"crm_system/config/auth"
 	entityRepo "crm_system/internal/auth/entity"
-	"crm_system/internal/auth/repository"
+	_ "crm_system/internal/auth/repository"
+	repoPkg "crm_system/internal/auth/repository"
 	"crm_system/pkg/auth/logger"
 	"fmt"
 )
 
-func Migrate(repo *repository.AuthRepo, l *logger.Logger) {
-	repo.DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
-	err := repo.DB.AutoMigrate(
-		&entityRepo.User{},
-		&entityRepo.Role{},
-	)
-	if err != nil {
-		l.Fatal("Automigration failed")
-	}
+func main() {
+	cfg := auth.NewConfig()
+	l := logger.New(cfg.Gin.Mode)
+	repo := repoPkg.New(cfg, l)
+
 	roles := []*entityRepo.Role{
 		{ID: 1, Name: "admin"},
 		{ID: 2, Name: "manager"},
@@ -42,5 +40,5 @@ func Migrate(repo *repository.AuthRepo, l *logger.Logger) {
 		repo.DB.Create(&newAdmin)
 	}
 
-	fmt.Println("👍 Migration complete")
+	fmt.Println("Mock data inserted successfully✅ auth-service")
 }

@@ -6,3 +6,9 @@ config/auth/config.yml
 .idea
 
 vendor
+
+docker/data
+docker
+
+data/kafka1
+data/zookeeper

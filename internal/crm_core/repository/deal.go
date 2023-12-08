@@ -2,16 +2,20 @@ package repository
 
 import (
 	"crm_system/internal/crm_core/entity"
+	"crm_system/internal/crm_core/metrics"
 	"github.com/gin-gonic/gin"
 )
 
 func (r *CRMSystemRepo) GetDeals(ctx *gin.Context) (*[]entity.Deal, error) {
 	var deals *[]entity.Deal
+	ok, fail := metrics.DatabaseQueryTime("GetDeals")
+	defer fail()
 
 	if err := r.DB.Find(&deals).Error; err != nil {
 		return nil, err
 	}
 
+	ok()
 	return deals, nil
 }
 
@@ -46,4 +50,29 @@ func (r *CRMSystemRepo) DeleteDeal(ctx *gin.Context, id string, deal *entity.Dea
 		return err
 	}
 	return nil
+}
+
+func (r *CRMSystemRepo) SearchDeal(ctx *gin.Context, query string) (*[]entity.Deal, error) {
+	var deals *[]entity.Deal
+
+	if err := r.DB.Where("title ILIKE ?", "%"+query+"%").Find(&deals).Error; err != nil {
+		return nil, err
+	}
+
+	return deals, nil
+}
+func (r *CRMSystemRepo) SortDeals(deals *[]entity.Deal, sortBy, sortOrder string) (*[]entity.Deal, error) {
+	if err := r.DB.Order(sortBy + " " + sortOrder).Find(&deals).Error; err != nil {
+		return nil, err
+	}
+
+	return deals, nil
+}
+
+func (r *CRMSystemRepo) FilterDealsByStatus(deals *[]entity.Deal, status string) (*[]entity.Deal, error) {
+	if err := r.DB.Where("status = ?", status).Find(&deals).Error; err != nil {
+		return nil, err
+	}
+
+	return deals, nil
 }

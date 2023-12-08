@@ -1,5 +1,5 @@
 // Package httpserver implements HTTP server.
-package httpserver
+package public
 
 import (
 	"context"
@@ -45,7 +45,7 @@ func New(handler http.Handler, config *crm_core.Configuration, opts ...Option) *
 
 func (s *Server) start() {
 	go func() {
-		log.Printf("Listening on port:%s", s.config.HTTP.Port)
+		log.Printf("Listening server on port:%s", s.config.HTTP.Port)
 		s.notify <- s.server.ListenAndServe()
 		close(s.notify)
 	}()

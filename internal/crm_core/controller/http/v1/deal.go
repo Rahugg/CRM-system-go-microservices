@@ -4,14 +4,12 @@ import (
 	"crm_system/internal/crm_core/controller/http/middleware"
 	"crm_system/internal/crm_core/entity"
 	"crm_system/internal/crm_core/service"
-	"crm_system/pkg/crm_core/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type dealRoutes struct {
 	s *service.Service
-	l *logger.Logger
 }
 
 func newDealRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.Middleware) {
@@ -20,16 +18,34 @@ func newDealRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 	dealHandler := handler.Group("/deal")
 	{
 		//middleware for users
+		dealHandler.Use(MW.MetricsHandler())
 		dealHandler.GET("/", r.getDeals)
 		dealHandler.GET("/:id", r.getDeal)
 		dealHandler.POST("/", r.createDeal)
 		dealHandler.PUT("/:id", r.updateDeal)
 		dealHandler.DELETE("/:id", r.deleteDeal)
+		dealHandler.GET("/search", r.searchDeal)
 	}
 }
 
+// getDeals godoc
+// @Summary Получить список соглашений
+// @Description Получить список соглашений
+// @Tags deal
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param sortBy query string false "sortBy"
+// @Param sortOrder query string false "sortOrder"
+// @Param status query string false "filter by status"
+// @Success 200 {object} entity.CustomResponseWithData
+// @Failure 404 {object} entity.CustomResponse
+// @Router /v1/deal/ [get]
 func (dr *dealRoutes) getDeals(ctx *gin.Context) {
-	deals, err := dr.s.GetDeals(ctx)
+	sortBy := ctx.Query("sortBy")
+	sortOrder := ctx.Query("sortOrder")
+	status := ctx.Query("status")
+	deals, err := dr.s.GetDeals(ctx, sortBy, sortOrder, status)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
@@ -45,6 +61,18 @@ func (dr *dealRoutes) getDeals(ctx *gin.Context) {
 		Data:    deals,
 	})
 }
+
+// getDeal godoc
+// @Summary Получить соглашение по id
+// @Description Получить соглашение по id
+// @Tags deal
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "id deal"
+// @Success 200 {object} entity.CustomResponseWithData
+// @Failure 400 {object} entity.CustomResponse
+// @Router /v1/deal/{id} [get]
 func (dr *dealRoutes) getDeal(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -64,6 +92,18 @@ func (dr *dealRoutes) getDeal(ctx *gin.Context) {
 		Data:    deal,
 	})
 }
+
+// createDeal godoc
+// @Summary Создать Соглашение
+// @Description Создать Соглашение
+// @Tags deal
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param dealInput body entity.Deal true "Create deal"
+// @Success 201 {object} entity.CustomResponse
+// @Failure 400 {object} entity.CustomResponse
+// @Router /v1/deal/ [post]
 func (dr *dealRoutes) createDeal(ctx *gin.Context) {
 	var deal entity.Deal
 
@@ -83,11 +123,24 @@ func (dr *dealRoutes) createDeal(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, &entity.CustomResponse{
+	ctx.JSON(http.StatusCreated, &entity.CustomResponse{
 		Status:  0,
 		Message: "OK",
 	})
 }
+
+// updateDeal godoc
+// @Summary Редактировать соглашение по id
+// @Description Редактировать соглашение по id
+// @Tags deal
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "id deal"
+// @Param newDeal body entity.Deal true "Update deal"
+// @Success 200 {object} entity.CustomResponse
+// @Failure 400 {object} entity.CustomResponse
+// @Router /v1/deal/{id} [put]
 func (dr *dealRoutes) updateDeal(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -114,11 +167,23 @@ func (dr *dealRoutes) updateDeal(ctx *gin.Context) {
 		Message: "OK",
 	})
 }
+
+// deleteDeal godoc
+// @Summary Удалить соглашение по id
+// @Description Удалить соглашение по id
+// @Tags deal
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "id deal"
+// @Success 200 {object} entity.CustomResponse
+// @Failure 400 {object} entity.CustomResponse
+// @Router /v1/deal/{id} [delete]
 func (dr *dealRoutes) deleteDeal(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	if err := dr.s.DeleteDeal(ctx, id); err != nil {
-		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
+		ctx.JSON(http.StatusNoContent, &entity.CustomResponse{
 			Status:  -1,
 			Message: err.Error(),
 		})
@@ -128,5 +193,34 @@ func (dr *dealRoutes) deleteDeal(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &entity.CustomResponse{
 		Status:  0,
 		Message: "OK",
+	})
+}
+
+// searchDeal godoc
+// @Summary Поиск соглашений по имени
+// @Description Поиск соглашений по имени
+// @Tags deal
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param searchQuery query string true "query"
+// @Success 200 {object} entity.CustomResponseWithData
+// @Failure 400 {object} entity.CustomResponse
+// @Router /v1/deal/search [get]
+func (dr *dealRoutes) searchDeal(ctx *gin.Context) {
+	query := ctx.Query("searchQuery")
+	deals, err := dr.s.SearchDeal(ctx, query)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, &entity.CustomResponseWithData{
+			Status:  -1,
+			Message: "Not found",
+			Data:    deals,
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, &entity.CustomResponseWithData{
+		Status:  0,
+		Message: "OK",
+		Data:    deals,
 	})
 }

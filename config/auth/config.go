@@ -3,18 +3,21 @@ package auth
 import (
 	"github.com/spf13/viper"
 	"log"
+	"time"
 )
 
 type (
 	// Configuration -.
 	Configuration struct {
-		App  `yaml:"app"`
-		HTTP `yaml:"http"`
-		Log  `yaml:"logger"`
-		Gin  `yaml:"gin"`
-		DB   `yaml:"db"`
-		//Auth `yaml:"auth"`
-		Jwt `yaml:"jwt"`
+		App     `yaml:"app"`
+		HTTP    `yaml:"http"`
+		Grpc    `yaml:"Grpc"`
+		Log     `yaml:"logger"`
+		Gin     `yaml:"gin"`
+		DB      `yaml:"db"`
+		Jwt     `yaml:"jwt"`
+		Kafka   `yaml:"kafka"`
+		Storage `yaml:"Storage"`
 	}
 
 	// App -.
@@ -49,21 +52,36 @@ type (
 		Port     int64  `env-required:"true" yaml:"port" env:"DB_PORT"`
 	}
 
-	//Auth struct {
-	//	Login    string `mapstructure:"login"`
-	//	Password string `mapstructure:"pass"`
-	//}
+	Grpc struct {
+		Port string `yaml:"Port"`
+	}
 
 	Jwt struct {
-		AccessPrivateKey     string `mapstructure:"access_private_key"`
-		AccessPublicKey      string `mapstructure:"access_public_key"`
-		AccessTokenExpiredIn int64  `mapstructure:"access_token_expired_in"`
-		AccessTokenMaxAge    int64  `mapstructure:"access_token_max_age"`
+		AccessPrivateKey     string        `mapstructure:"access_private_key"`
+		AccessPublicKey      string        `mapstructure:"access_public_key"`
+		AccessTokenExpiredIn time.Duration `mapstructure:"access_token_expired_in"`
+		AccessTokenMaxAge    int64         `mapstructure:"access_token_max_age"`
 
-		RefreshPrivateKey     string `mapstructure:"refresh_private_key"`
-		RefreshPublicKey      string `mapstructure:"refresh_public_key"`
-		RefreshTokenExpiredIn int64  `mapstructure:"refresh_token_expired_in"`
-		RefreshTokenMaxAge    int64  `mapstructure:"refresh_token_max_age"`
+		RefreshPrivateKey     string        `mapstructure:"refresh_private_key"`
+		RefreshPublicKey      string        `mapstructure:"refresh_public_key"`
+		RefreshTokenExpiredIn time.Duration `mapstructure:"refresh_token_expired_in"`
+		RefreshTokenMaxAge    int64         `mapstructure:"refresh_token_max_age"`
+	}
+	Kafka struct {
+		Brokers  []string `yaml:"brokers"`
+		Producer Producer `yaml:"producer"`
+		Consumer Consumer `yaml:"consumer"`
+	}
+	Producer struct {
+		Topic string `yaml:"topic"`
+	}
+	Consumer struct {
+		Topics []string `yaml:"topics"`
+	}
+
+	Storage struct {
+		Interval        time.Duration `yaml:"Interval"`
+		ShutdownTimeout time.Duration `yaml:"ShutdownTimeout"`
 	}
 )
 

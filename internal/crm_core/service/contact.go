@@ -5,14 +5,46 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *Service) GetContacts(ctx *gin.Context) (*[]entity.Contact, error) {
+func (s *Service) GetContacts(ctx *gin.Context, sortBy, sortOrder, phone string) (*[]entity.Contact, error) {
 	contacts, err := s.Repo.GetContacts(ctx)
+
+	if phone != "" {
+		contacts, err = s.filterContactsByPhone(contacts, phone)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if sortBy != "" {
+		contacts, err = s.sortContacts(contacts, sortBy, sortOrder)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	if err != nil {
 		return nil, err
 	}
 	return contacts, nil
 }
+func (s *Service) sortContacts(contacts *[]entity.Contact, sortBy, sortOrder string) (*[]entity.Contact, error) {
+	contacts, err := s.Repo.SortContacts(contacts, sortBy, sortOrder)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return contacts, nil
+}
+
+func (s *Service) filterContactsByPhone(contacts *[]entity.Contact, phone string) (*[]entity.Contact, error) {
+	contacts, err := s.Repo.FilterContactsByPhone(contacts, phone)
+	if err != nil {
+		return nil, err
+	}
+	return contacts, nil
+}
+
 func (s *Service) GetContact(ctx *gin.Context, id string) (*entity.Contact, error) {
 	contact, err := s.Repo.GetContact(ctx, id)
 
@@ -75,4 +107,13 @@ func (s *Service) DeleteContact(ctx *gin.Context, id string) error {
 	}
 
 	return nil
+}
+
+func (s *Service) SearchContact(ctx *gin.Context, query string) (*[]entity.Contact, error) {
+	contacts, err := s.Repo.SearchContact(ctx, query)
+	if err != nil {
+		return contacts, err
+	}
+
+	return contacts, nil
 }

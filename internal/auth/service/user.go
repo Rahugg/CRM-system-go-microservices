@@ -1,52 +1,54 @@
 package service
 
 import (
+	"crm_system/internal/auth/controller/consumer/dto"
 	entity2 "crm_system/internal/auth/entity"
 	"crm_system/pkg/auth/utils"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"math/rand"
 	"strings"
-	"time"
 )
 
-func (s *Service) SignUp(ctx *gin.Context, payload *entity2.SignUpInput, roleId uint, verified bool, provider string) (interface{}, error) {
+func (s *Service) SignUp(ctx *gin.Context, payload *entity2.SignUpInput, roleId uint, provider string) (string, error) {
 	if !utils.IsValidEmail(payload.Email) {
-		return nil, errors.New("email validation error")
+		return "", errors.New("email validation error")
 	}
 
 	if !utils.IsValidPassword(payload.Password) {
-		return nil, errors.New("passwords should contain:\nUppercase letters: A-Z\nLowercase letters: a-z\nNumbers: 0-9")
+		return "", errors.New("passwords should contain:\nUppercase letters: A-Z\nLowercase letters: a-z\nNumbers: 0-9")
 	}
 
 	if payload.Password != payload.PasswordConfirm {
-		return nil, errors.New("passwords do not match")
+		return "", errors.New("passwords do not match")
 	}
 
 	hashedPassword, err := utils.HashPassword(payload.Password)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	user := entity2.User{
-		FirstName: payload.FirstName,
-		LastName:  payload.LastName,
-		Email:     strings.ToLower(payload.Email),
-		Password:  hashedPassword,
-		RoleID:    roleId,
-		Provider:  provider,
+		FirstName:   payload.FirstName,
+		LastName:    payload.LastName,
+		Email:       strings.ToLower(payload.Email),
+		Password:    hashedPassword,
+		RoleID:      roleId,
+		Provider:    provider,
+		IsConfirmed: false,
 	}
 
 	if err = s.Repo.CreateUser(ctx, &user); err != nil {
-		return nil, err
+		return "", err
 	}
-
-	result, err := s.returnUsers(ctx, user.RoleID)
+	userResponse, err := s.Repo.GetUserByEmail(ctx, user.Email)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return &result, nil
+	return userResponse.ID.String(), nil
 }
 
 func (s *Service) SignIn(ctx *gin.Context, payload *entity2.SignInInput) (*entity2.SignInResult, error) {
@@ -59,12 +61,12 @@ func (s *Service) SignIn(ctx *gin.Context, payload *entity2.SignInInput) (*entit
 		return nil, err
 	}
 
-	accessToken, err := utils.GenerateToken(time.Duration(s.Config.Jwt.AccessTokenExpiredIn), user.ID, s.Config.Jwt.AccessPrivateKey)
+	accessToken, err := utils.GenerateToken(s.Config.Jwt.AccessTokenExpiredIn, user.ID, s.Config.Jwt.AccessPrivateKey)
 	if err != nil {
 		return nil, err
 	}
 
-	refreshToken, err := utils.GenerateToken(time.Duration(s.Config.Jwt.RefreshTokenExpiredIn), user.ID, s.Config.Jwt.RefreshPrivateKey)
+	refreshToken, err := utils.GenerateToken(s.Config.Jwt.RefreshTokenExpiredIn, user.ID, s.Config.Jwt.RefreshPrivateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -79,39 +81,47 @@ func (s *Service) SignIn(ctx *gin.Context, payload *entity2.SignInInput) (*entit
 	return &data, nil
 }
 
-func (s *Service) returnUsers(ctx *gin.Context, roleId uint) (*[]entity2.SignUpResult, error) {
-	users, err := s.Repo.GetUsersByRole(ctx, roleId)
+func (s *Service) GetUsers(sortBy, sortOrder, age string) (*[]entity2.User, error) {
+	users, err := s.Storage.GetAllUsers()
+	if err != nil {
+		return nil, err
+	}
+	if age != "" {
+		users, err = s.filterUsersByAge(users, age)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if sortBy != "" {
+		users, err = s.sortUsers(users, sortBy, sortOrder)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return users, nil
+}
+
+func (s *Service) sortUsers(users *[]entity2.User, sortBy, sortOrder string) (*[]entity2.User, error) {
+	users, err := s.Repo.SortUsers(users, sortBy, sortOrder)
+
 	if err != nil {
 		return nil, err
 	}
 
-	result := make([]entity2.SignUpResult, len(*users))
-
-	for i, user := range *users {
-		result[i] = entity2.SignUpResult{
-			ID:        user.ID,
-			FirstName: user.FirstName,
-			LastName:  user.LastName,
-			Email:     user.Email,
-			Role:      user.Role.Name,
-			Provider:  user.Provider,
-			CreatedAt: user.CreatedAt,
-			UpdatedAt: user.UpdatedAt,
-		}
-	}
-	return &result, nil
+	return users, nil
 }
-
-func (s *Service) GetUsers(ctx *gin.Context) (*[]entity2.User, error) {
-	users, err := s.Repo.GetUsers(ctx)
-
+func (s *Service) filterUsersByAge(users *[]entity2.User, age string) (*[]entity2.User, error) {
+	users, err := s.Repo.FilterUsersByAge(users, age)
 	if err != nil {
 		return nil, err
 	}
 	return users, nil
 }
-func (s *Service) GetUser(ctx *gin.Context, id string) (*entity2.User, error) {
-	user, err := s.Repo.GetUser(ctx, id)
+
+func (s *Service) GetUser(id string) (*entity2.User, error) {
+	user, err := s.Repo.GetUser(id)
 
 	if err != nil {
 		return nil, err
@@ -126,8 +136,8 @@ func (s *Service) CreateUser(ctx *gin.Context, user *entity2.User) error {
 
 	return nil
 }
-func (s *Service) UpdateUser(ctx *gin.Context, newUser *entity2.User, id string) error {
-	user, err := s.Repo.GetUser(ctx, id)
+func (s *Service) UpdateUser(newUser *entity2.User, id string) error {
+	user, err := s.Repo.GetUser(id)
 	if err != nil {
 		return err
 	}
@@ -164,7 +174,7 @@ func (s *Service) UpdateUser(ctx *gin.Context, newUser *entity2.User, id string)
 		user.Password = newUser.Password
 	}
 
-	if err = s.Repo.SaveUser(ctx, user); err != nil {
+	if err = s.Repo.SaveUser(user); err != nil {
 		return err
 	}
 
@@ -172,7 +182,7 @@ func (s *Service) UpdateUser(ctx *gin.Context, newUser *entity2.User, id string)
 }
 
 func (s *Service) DeleteUser(ctx *gin.Context, id string) error {
-	user, err := s.Repo.GetUser(ctx, id)
+	user, err := s.Repo.GetUser(id)
 	if err != nil {
 		return err
 	}
@@ -228,9 +238,48 @@ func (s *Service) UpdateMe(ctx *gin.Context, newUser *entity2.User) error {
 		user.Password = newUser.Password
 	}
 
-	if err := s.Repo.SaveUser(ctx, user); err != nil {
+	if err := s.Repo.SaveUser(user); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (s *Service) SearchUser(ctx *gin.Context, query string) (*[]entity2.User, error) {
+	users, err := s.Repo.SearchUser(ctx, query)
+	if err != nil {
+		return users, err
+	}
+
+	return users, nil
+}
+
+func (s *Service) CreateUserCode(id string) error {
+	randNum1 := rand.Intn(999-100) + 100
+	randNum2 := rand.Intn(999-100) + 100
+
+	userCode := dto.UserCode{Code: fmt.Sprintf("%d%d", randNum1, randNum2)}
+	b, err := json.Marshal(&userCode)
+	if err != nil {
+		return fmt.Errorf("failed to marshall UserCode err: %w", err)
+	}
+
+	s.userVerificationProducer.ProduceMessage(b)
+	err = s.Repo.CreateUserCode(id, userCode.Code)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+func (s *Service) ConfirmUser(code string) error {
+	err := s.Repo.ConfirmUser(code)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
 }

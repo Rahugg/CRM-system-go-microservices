@@ -1,0 +1,12 @@
+FROM golang:1.20-alpine as builder
+
+WORKDIR /app
+
+COPY .. .
+
+EXPOSE 8082
+
+RUN go mod download
+RUN go build ./cmd/crm_core
+
+CMD ["go", "run", "./cmd/crm_core"]

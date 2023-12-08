@@ -1,0 +1,416 @@
+definitions:
+  entity.CustomResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  entity.CustomResponseWithData:
+    properties:
+      data: {}
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  entity.InputCode:
+    properties:
+      code:
+        type: string
+    type: object
+  entity.Role:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  entity.SignInInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  entity.SignUpInput:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 8
+        type: string
+      passwordConfirm:
+        type: string
+      surname:
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - passwordConfirm
+    - surname
+    type: object
+  entity.User:
+    properties:
+      ID:
+        type: string
+      age:
+        type: integer
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      is_confirmed:
+        type: boolean
+      last_name:
+        type: string
+      phone:
+        type: string
+      provider:
+        type: string
+      role:
+        $ref: '#/definitions/entity.Role'
+      role_id:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+host: localhost:8081
+info:
+  contact: {}
+  description: auth_service
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: auth-service
+  version: "1.0"
+paths:
+  /v1/admin/user/:
+    get:
+      consumes:
+      - application/json
+      description: Получить список пользователей
+      parameters:
+      - description: sortBy
+        in: query
+        name: sortBy
+        type: string
+      - description: sortOrder
+        in: query
+        name: sortOrder
+        type: string
+      - description: filter by age
+        in: query
+        name: age
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить список пользователей
+      tags:
+      - admin
+    post:
+      consumes:
+      - application/json
+      description: Создать Пользователя
+      parameters:
+      - description: Create User
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Создать Пользователя
+      tags:
+      - admin
+  /v1/admin/user/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удалить пользователя по id
+      parameters:
+      - description: id user
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Удалить пользователя по id
+      tags:
+      - admin
+    get:
+      consumes:
+      - application/json
+      description: Получить пользователя по id
+      parameters:
+      - description: id user
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить пользователя по id
+      tags:
+      - admin
+    put:
+      consumes:
+      - application/json
+      description: Редактировать пользователя по id
+      parameters:
+      - description: id user
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update User
+        in: body
+        name: inputUser
+        required: true
+        schema:
+          $ref: '#/definitions/entity.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Редактировать пользователя по id
+      tags:
+      - admin
+  /v1/admin/user/search:
+    get:
+      consumes:
+      - application/json
+      description: Поиск пользователя по имени
+      parameters:
+      - description: query
+        in: query
+        name: searchQuery
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Поиск пользователя по имени
+      tags:
+      - admin
+  /v1/user/confirm/:
+    post:
+      consumes:
+      - application/json
+      description: Подтвердить пользователя по коду
+      parameters:
+      - description: Код
+        in: body
+        name: inputCode
+        required: true
+        schema:
+          $ref: '#/definitions/entity.InputCode'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      summary: Подтвердить пользователя по коду
+      tags:
+      - auth
+  /v1/user/login:
+    post:
+      consumes:
+      - application/json
+      description: Авторизовать пользователя с помощью signIn
+      parameters:
+      - description: Authorize user
+        in: body
+        name: signIn
+        required: true
+        schema:
+          $ref: '#/definitions/entity.SignInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      summary: Авторизовать пользователя с помощью signUp
+      tags:
+      - auth
+  /v1/user/me/:
+    get:
+      consumes:
+      - application/json
+      description: Получить информацию о себе
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponseWithData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Получить информацию о себе
+      tags:
+      - cabinet
+    put:
+      consumes:
+      - application/json
+      description: Поменять информацию о себе
+      parameters:
+      - description: Поменять информацию о себе
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      security:
+      - BearerAuth: []
+      summary: Поменять информацию о себе
+      tags:
+      - cabinet
+  /v1/user/register:
+    post:
+      consumes:
+      - application/json
+      description: Зарегистрировать пользователя с помощью signUp
+      parameters:
+      - description: Register user
+        in: body
+        name: signUp
+        required: true
+        schema:
+          $ref: '#/definitions/entity.SignUpInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.CustomResponse'
+      summary: Зарегистрировать пользователя с помощью signUp
+      tags:
+      - auth
+schemes:
+- https
+- http
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

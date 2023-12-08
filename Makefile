@@ -1,6 +1,3 @@
-include .env.example
-export
-
 LOCAL_BIN:=$(CURDIR)/bin
 PATH:=$(LOCAL_BIN):$(PATH)
 
@@ -21,51 +18,47 @@ compose-down: ### Down docker-compose
 	docker-compose down --remove-orphans
 .PHONY: compose-down
 
-swag-v1: ### swag init
-	swag init -g internal/controller/http/v1/router.go
-.PHONY: swag-v1
-
-run: swag-v1 ### swag run
-	go mod tidy && go mod download && \
-	DISABLE_SWAGGER_HTTP_HANDLER='' GIN_MODE=debug CGO_ENABLED=0 go run -tags migrate ./cmd/app
-.PHONY: run
-
-docker-rm-volume: ### remove docker volume
-	docker volume rm go-clean-template_pg-data
-.PHONY: docker-rm-volume
-
-linter-golangci: ### check by golangci linter
-	golangci-lint run
-.PHONY: linter-golangci
-
-linter-hadolint: ### check by hadolint linter
-	git ls-files --exclude='Dockerfile*' --ignored | xargs hadolint
-.PHONY: linter-hadolint
-
-linter-dotenv: ### check by dotenv linter
-	dotenv-linter
-.PHONY: linter-dotenv
-
-test: ### run test
-	go test -v -cover -race ./internal/...
-.PHONY: test
-
-integration-test: ### run integration-test
-	go clean -testcache && go test -v ./integration-test/...
-.PHONY: integration-test
-
-mock: ### run mockgen
-	mockgen -source ./internal/usecase/interfaces.go -package usecase_test > ./internal/usecase/mocks_test.go
+mock-data: ### run mockgen
+	go run migrations/crm_mock/crm_mock.go && go run migrations/auth_mock/auth_mock.go
 .PHONY: mock
 
-migrate-create:  ### create new migration
-	migrate create - ext sql -dir migrations "migrate_name"
-.PHONY: migrate-create
-
 migrate-up: ### migration up
-	migrate -path migrations -database '$(PG_URL)?sslmode=disable' up
+	go run migrations/auth/migrate.go && go run migrations/crm_core/migrate.go
+
 .PHONY: migrate-up
 
 migrate-down: ### migration down
-	migrate -path migrations -database '$(PG_URL)?sslmode=disable' down
+	go run migrations/auth_down/migrate_down.go && go run migrations/crm_core_down/migrate_down.go
 .PHONY: migrate-down
+
+start-auth:
+	go run cmd/auth/main.go
+.PHONY: start-auth
+
+start-crm:
+	go run cmd/crm_core/main.go
+.PHONY: start-crm
+
+build-dockerfile-auth:
+	docker build -f dockerfile-auth -t auth-service .
+./PHONY: build-dockerfile-auth
+
+build-dockerfile-crm:
+	docker build -f dockerfile-crm -t crm-service .
+./PHONY: build-dockerfile-crm
+
+swag-auth:
+	cd internal/auth && swag init --parseDependency --parseInternal -g ../../cmd/auth/main.go
+./PHONY: swag-auth
+
+swag-crm:
+	cd internal/crm_core && swag init --parseDependency --parseInternal -g ../../cmd/crm_core/main.go
+./PHONY: swag-crm
+
+gen-proto:
+	protoc --go_out ./gw --go_opt paths=source_relative --go-grpc_out ./gw --go-grpc_opt paths=source_relative --grpc-gateway_out=./gw --grpc-gateway_opt logtostderr=true --grpc-gateway_opt generate_unbound_methods=true --proto_path=../../ --proto_path=./ auth.proto
+./PHONY: gen-proto
+
+linter-go:
+	golangci-lint run
+./PHONY: linter-go
