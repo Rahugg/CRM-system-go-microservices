@@ -2,7 +2,6 @@ package service
 
 import (
 	"crm_system/internal/crm_core/entity"
-	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"sort"
 	"strconv"
@@ -153,8 +152,8 @@ func appendTasks(tasks []entity.Task, user *entity.User, dashboardTodos map[stri
 	return dashboardTodos
 }
 
-func (s *Service) GetTask(ctx *gin.Context, id string) (*entity.Task, error) {
-	task, err := s.Repo.GetTask(ctx, id)
+func (s *Service) GetTask(id string) (*entity.Task, error) {
+	task, err := s.Repo.GetTask(id)
 
 	if err != nil {
 		return nil, err
@@ -163,8 +162,8 @@ func (s *Service) GetTask(ctx *gin.Context, id string) (*entity.Task, error) {
 	return task, nil
 }
 
-func (s *Service) CreateTask(ctx *gin.Context, task *entity.TaskInput) error {
-	if err := s.Repo.CreateTask(ctx, task); err != nil {
+func (s *Service) CreateTask(task *entity.TaskInput) error {
+	if err := s.Repo.CreateTask(task); err != nil {
 		return err
 	}
 
@@ -186,8 +185,8 @@ func (s *Service) GetChangesOfTask(id string) (*[]entity.TaskChanges, error) {
 	return todoChanges, nil
 }
 
-func (s *Service) UpdateTask(ctx *gin.Context, newTask entity.TaskEditInput, id string, user *entity.User) error {
-	task, err := s.Repo.GetTask(ctx, id)
+func (s *Service) UpdateTask(newTask entity.TaskEditInput, id string, user *entity.User) error {
+	task, err := s.Repo.GetTask(id)
 	if err != nil {
 		return err
 	}
@@ -242,31 +241,31 @@ func (s *Service) UpdateTask(ctx *gin.Context, newTask entity.TaskEditInput, id 
 		task.State = newTask.State
 	}
 
-	if err = s.Repo.CreateTaskChanges(ctx, &taskChanges); err != nil {
+	if err = s.Repo.CreateTaskChanges(&taskChanges); err != nil {
 		return err
 	}
 
-	if err = s.Repo.SaveTask(ctx, task); err != nil {
+	if err = s.Repo.SaveTask(task); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (s *Service) DeleteTask(ctx *gin.Context, id string) error {
-	company, err := s.Repo.GetTask(ctx, id)
+func (s *Service) DeleteTask(id string) error {
+	company, err := s.Repo.GetTask(id)
 	if err != nil {
 		return err
 	}
 
-	if err = s.Repo.DeleteTask(ctx, id, company); err != nil {
+	if err = s.Repo.DeleteTask(id, company); err != nil {
 		return err
 	}
 
 	return nil
 }
-func (s *Service) SearchTask(ctx *gin.Context, query string) (*[]entity.Task, error) {
-	tasks, err := s.Repo.SearchTask(ctx, query)
+func (s *Service) SearchTask(query string) (*[]entity.Task, error) {
+	tasks, err := s.Repo.SearchTask(query)
 	if err != nil {
 		return tasks, err
 	}

@@ -19,6 +19,8 @@ func newTicketRoutes(handler *gin.RouterGroup, s *service.Service, MW *middlewar
 	{
 		//middleware for users
 		ticketHandler.Use(MW.MetricsHandler())
+		ticketHandler.Use(MW.DeserializeUser("admin", "manager"))
+
 		ticketHandler.GET("/", r.getTickets)
 		ticketHandler.GET("/:id", r.getTicket)
 		ticketHandler.POST("/", r.createTicket)
@@ -45,7 +47,7 @@ func (tr *ticketRoutes) getTickets(ctx *gin.Context) {
 	sortBy := ctx.Query("sortBy")
 	sortOrder := ctx.Query("sortOrder")
 	status := ctx.Query("status")
-	tickets, err := tr.s.GetTickets(ctx, sortBy, sortOrder, status)
+	tickets, err := tr.s.GetTickets(sortBy, sortOrder, status)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
@@ -76,7 +78,7 @@ func (tr *ticketRoutes) getTickets(ctx *gin.Context) {
 func (tr *ticketRoutes) getTicket(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	ticket, err := tr.s.GetTicket(ctx, id)
+	ticket, err := tr.s.GetTicket(id)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
@@ -115,7 +117,7 @@ func (tr *ticketRoutes) createTicket(ctx *gin.Context) {
 		return
 	}
 
-	if err := tr.s.CreateTicket(ctx, ticket); err != nil {
+	if err := tr.s.CreateTicket(ticket); err != nil {
 		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
 			Status:  -2,
 			Message: err.Error(),
@@ -154,7 +156,7 @@ func (tr *ticketRoutes) updateTicket(ctx *gin.Context) {
 		return
 	}
 
-	if err := tr.s.UpdateTicket(ctx, newTicket, id); err != nil {
+	if err := tr.s.UpdateTicket(newTicket, id); err != nil {
 		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
 			Status:  -2,
 			Message: err.Error(),
@@ -182,7 +184,7 @@ func (tr *ticketRoutes) updateTicket(ctx *gin.Context) {
 func (tr *ticketRoutes) deleteTicket(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	if err := tr.s.DeleteTicket(ctx, id); err != nil {
+	if err := tr.s.DeleteTicket(id); err != nil {
 		ctx.JSON(http.StatusNoContent, &entity.CustomResponse{
 			Status:  -1,
 			Message: err.Error(),
@@ -209,7 +211,7 @@ func (tr *ticketRoutes) deleteTicket(ctx *gin.Context) {
 // @Router /v1/ticket/search [get]
 func (tr *ticketRoutes) searchTicket(ctx *gin.Context) {
 	query := ctx.Query("searchQuery")
-	tickets, err := tr.s.SearchTicket(ctx, query)
+	tickets, err := tr.s.SearchTicket(query)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponseWithData{
 			Status:  -1,

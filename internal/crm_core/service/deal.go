@@ -2,11 +2,10 @@ package service
 
 import (
 	"crm_system/internal/crm_core/entity"
-	"github.com/gin-gonic/gin"
 )
 
-func (s *Service) GetDeals(ctx *gin.Context, sortBy, sortOrder, status string) (*[]entity.Deal, error) {
-	deals, err := s.Repo.GetDeals(ctx)
+func (s *Service) GetDeals(sortBy, sortOrder, status string) (*[]entity.Deal, error) {
+	deals, err := s.Repo.GetDeals()
 	if err != nil {
 		return nil, err
 	}
@@ -45,8 +44,8 @@ func (s *Service) filterDealsByStatus(deals *[]entity.Deal, status string) (*[]e
 	return deals, nil
 }
 
-func (s *Service) GetDeal(ctx *gin.Context, id string) (*entity.Deal, error) {
-	deal, err := s.Repo.GetDeal(ctx, id)
+func (s *Service) GetDeal(id string) (*entity.Deal, error) {
+	deal, err := s.Repo.GetDeal(id)
 
 	if err != nil {
 		return nil, err
@@ -54,15 +53,15 @@ func (s *Service) GetDeal(ctx *gin.Context, id string) (*entity.Deal, error) {
 
 	return deal, nil
 }
-func (s *Service) CreateDeal(ctx *gin.Context, deal entity.Deal) error {
-	if err := s.Repo.CreateDeal(ctx, &deal); err != nil {
+func (s *Service) CreateDeal(deal entity.Deal) error {
+	if err := s.Repo.CreateDeal(&deal); err != nil {
 		return err
 	}
 
 	return nil
 }
-func (s *Service) UpdateDeal(ctx *gin.Context, newDeal entity.Deal, id string) error {
-	deal, err := s.Repo.GetDeal(ctx, id)
+func (s *Service) UpdateDeal(newDeal entity.Deal, id string) error {
+	deal, err := s.Repo.GetDeal(id)
 	if err != nil {
 		return err
 	}
@@ -87,7 +86,7 @@ func (s *Service) UpdateDeal(ctx *gin.Context, newDeal entity.Deal, id string) e
 		deal.RepID = newDeal.RepID
 	}
 
-	if err = s.Repo.SaveDeal(ctx, deal); err != nil {
+	if err = s.Repo.SaveDeal(deal); err != nil {
 		return err
 	}
 
@@ -102,21 +101,21 @@ func isValidDealStatus(status entity.StatusDeal) bool {
 	}
 }
 
-func (s *Service) DeleteDeal(ctx *gin.Context, id string) error {
-	deal, err := s.Repo.GetDeal(ctx, id)
+func (s *Service) DeleteDeal(id string) error {
+	deal, err := s.Repo.GetDeal(id)
 	if err != nil {
 		return err
 	}
 
-	if err = s.Repo.DeleteDeal(ctx, id, deal); err != nil {
+	if err = s.Repo.DeleteDeal(id, deal); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (s *Service) SearchDeal(ctx *gin.Context, query string) (*[]entity.Deal, error) {
-	deals, err := s.Repo.SearchDeal(ctx, query)
+func (s *Service) SearchDeal(query string) (*[]entity.Deal, error) {
+	deals, err := s.Repo.SearchDeal(query)
 	if err != nil {
 		return deals, err
 	}

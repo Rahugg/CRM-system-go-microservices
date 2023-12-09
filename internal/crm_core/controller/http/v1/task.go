@@ -92,7 +92,7 @@ func (tr *taskRoutes) getTasks(ctx *gin.Context) {
 func (tr *taskRoutes) getTask(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	task, err := tr.s.GetTask(ctx, id)
+	task, err := tr.s.GetTask(id)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
@@ -139,7 +139,7 @@ func (tr *taskRoutes) createTask(ctx *gin.Context) {
 		return
 	}
 
-	if err := tr.s.CreateTask(ctx, &task); err != nil {
+	if err := tr.s.CreateTask(&task); err != nil {
 		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
 			Status:  -2,
 			Message: err.Error(),
@@ -216,7 +216,7 @@ func (tr *taskRoutes) updateTask(ctx *gin.Context) {
 		return
 	}
 
-	if err := tr.s.UpdateTask(ctx, task, id, user); err != nil {
+	if err := tr.s.UpdateTask(task, id, user); err != nil {
 		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
 			Status:  -2,
 			Message: err.Error(),
@@ -244,7 +244,7 @@ func (tr *taskRoutes) updateTask(ctx *gin.Context) {
 func (tr *taskRoutes) deleteTask(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	if err := tr.s.DeleteTask(ctx, id); err != nil {
+	if err := tr.s.DeleteTask(id); err != nil {
 		ctx.JSON(http.StatusNoContent, &entity.CustomResponse{
 			Status:  -1,
 			Message: err.Error(),
@@ -301,7 +301,7 @@ func (tr *taskRoutes) getChangesOfTask(ctx *gin.Context) {
 // @Router /v1/task/search [get]
 func (tr *taskRoutes) searchTask(ctx *gin.Context) {
 	query := ctx.Query("searchQuery")
-	tasks, err := tr.s.SearchTask(ctx, query)
+	tasks, err := tr.s.SearchTask(query)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponseWithData{
 			Status:  -1,

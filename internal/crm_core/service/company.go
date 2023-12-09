@@ -2,11 +2,10 @@ package service
 
 import (
 	"crm_system/internal/crm_core/entity"
-	"github.com/gin-gonic/gin"
 )
 
-func (s *Service) GetCompanies(ctx *gin.Context, sortBy, sortOrder, phone string) (*[]entity.Company, error) {
-	companies, err := s.Repo.GetCompanies(ctx)
+func (s *Service) GetCompanies(sortBy, sortOrder, phone string) (*[]entity.Company, error) {
+	companies, err := s.Repo.GetCompanies()
 	if err != nil {
 		return nil, err
 	}
@@ -45,8 +44,8 @@ func (s *Service) filterCompaniesByPhone(companies *[]entity.Company, phone stri
 	return companies, nil
 }
 
-func (s *Service) GetCompany(ctx *gin.Context, id string) (*entity.Company, error) {
-	company, err := s.Repo.GetCompany(ctx, id)
+func (s *Service) GetCompany(id string) (*entity.Company, error) {
+	company, err := s.Repo.GetCompany(id)
 
 	if err != nil {
 		return nil, err
@@ -55,16 +54,16 @@ func (s *Service) GetCompany(ctx *gin.Context, id string) (*entity.Company, erro
 	return company, nil
 }
 
-func (s *Service) CreateCompany(ctx *gin.Context, company entity.Company) error {
-	if err := s.Repo.CreateCompany(ctx, &company); err != nil {
+func (s *Service) CreateCompany(company entity.Company) error {
+	if err := s.Repo.CreateCompany(&company); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (s *Service) UpdateCompany(ctx *gin.Context, newCompany entity.NewCompany, id string) error {
-	company, err := s.Repo.GetCompany(ctx, id)
+func (s *Service) UpdateCompany(newCompany entity.NewCompany, id string) error {
+	company, err := s.Repo.GetCompany(id)
 	if err != nil {
 		return err
 	}
@@ -81,28 +80,28 @@ func (s *Service) UpdateCompany(ctx *gin.Context, newCompany entity.NewCompany, 
 		company.Phone = newCompany.Phone
 	}
 
-	if err = s.Repo.SaveCompany(ctx, company); err != nil {
+	if err = s.Repo.SaveCompany(company); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (s *Service) DeleteCompany(ctx *gin.Context, id string) error {
-	company, err := s.Repo.GetCompany(ctx, id)
+func (s *Service) DeleteCompany(id string) error {
+	company, err := s.Repo.GetCompany(id)
 	if err != nil {
 		return err
 	}
 
-	if err = s.Repo.DeleteCompany(ctx, id, company); err != nil {
+	if err = s.Repo.DeleteCompany(id, company); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (s *Service) SearchCompany(ctx *gin.Context, query string) (*[]entity.Company, error) {
-	companies, err := s.Repo.SearchCompany(ctx, query)
+func (s *Service) SearchCompany(query string) (*[]entity.Company, error) {
+	companies, err := s.Repo.SearchCompany(query)
 	if err != nil {
 		return companies, err
 	}

@@ -19,12 +19,13 @@ func newDealRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 	{
 		//middleware for users
 		dealHandler.Use(MW.MetricsHandler())
-		dealHandler.GET("/", r.getDeals)
-		dealHandler.GET("/:id", r.getDeal)
-		dealHandler.POST("/", r.createDeal)
-		dealHandler.PUT("/:id", r.updateDeal)
-		dealHandler.DELETE("/:id", r.deleteDeal)
-		dealHandler.GET("/search", r.searchDeal)
+
+		dealHandler.GET("/", MW.DeserializeUser("any"), r.getDeals)
+		dealHandler.GET("/:id", MW.DeserializeUser("any"), r.getDeal)
+		dealHandler.POST("/", MW.DeserializeUser("any"), r.createDeal)
+		dealHandler.PUT("/:id", MW.DeserializeUser("any"), r.updateDeal)
+		dealHandler.DELETE("/:id", MW.DeserializeUser("any"), r.deleteDeal)
+		dealHandler.GET("/search", MW.DeserializeUser("any"), r.searchDeal)
 	}
 }
 
@@ -45,7 +46,7 @@ func (dr *dealRoutes) getDeals(ctx *gin.Context) {
 	sortBy := ctx.Query("sortBy")
 	sortOrder := ctx.Query("sortOrder")
 	status := ctx.Query("status")
-	deals, err := dr.s.GetDeals(ctx, sortBy, sortOrder, status)
+	deals, err := dr.s.GetDeals(sortBy, sortOrder, status)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
@@ -76,7 +77,7 @@ func (dr *dealRoutes) getDeals(ctx *gin.Context) {
 func (dr *dealRoutes) getDeal(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	deal, err := dr.s.GetDeal(ctx, id)
+	deal, err := dr.s.GetDeal(id)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
@@ -115,7 +116,7 @@ func (dr *dealRoutes) createDeal(ctx *gin.Context) {
 		return
 	}
 
-	if err := dr.s.CreateDeal(ctx, deal); err != nil {
+	if err := dr.s.CreateDeal(deal); err != nil {
 		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
 			Status:  -2,
 			Message: err.Error(),
@@ -154,7 +155,7 @@ func (dr *dealRoutes) updateDeal(ctx *gin.Context) {
 		return
 	}
 
-	if err := dr.s.UpdateDeal(ctx, newDeal, id); err != nil {
+	if err := dr.s.UpdateDeal(newDeal, id); err != nil {
 		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
 			Status:  -2,
 			Message: err.Error(),
@@ -182,7 +183,7 @@ func (dr *dealRoutes) updateDeal(ctx *gin.Context) {
 func (dr *dealRoutes) deleteDeal(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	if err := dr.s.DeleteDeal(ctx, id); err != nil {
+	if err := dr.s.DeleteDeal(id); err != nil {
 		ctx.JSON(http.StatusNoContent, &entity.CustomResponse{
 			Status:  -1,
 			Message: err.Error(),
@@ -209,7 +210,7 @@ func (dr *dealRoutes) deleteDeal(ctx *gin.Context) {
 // @Router /v1/deal/search [get]
 func (dr *dealRoutes) searchDeal(ctx *gin.Context) {
 	query := ctx.Query("searchQuery")
-	deals, err := dr.s.SearchDeal(ctx, query)
+	deals, err := dr.s.SearchDeal(query)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponseWithData{
 			Status:  -1,

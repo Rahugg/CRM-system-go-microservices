@@ -2,11 +2,10 @@ package service
 
 import (
 	"crm_system/internal/crm_core/entity"
-	"github.com/gin-gonic/gin"
 )
 
-func (s *Service) GetContacts(ctx *gin.Context, sortBy, sortOrder, phone string) (*[]entity.Contact, error) {
-	contacts, err := s.Repo.GetContacts(ctx)
+func (s *Service) GetContacts(sortBy, sortOrder, phone string) (*[]entity.Contact, error) {
+	contacts, err := s.Repo.GetContacts()
 
 	if phone != "" {
 		contacts, err = s.filterContactsByPhone(contacts, phone)
@@ -45,8 +44,8 @@ func (s *Service) filterContactsByPhone(contacts *[]entity.Contact, phone string
 	return contacts, nil
 }
 
-func (s *Service) GetContact(ctx *gin.Context, id string) (*entity.Contact, error) {
-	contact, err := s.Repo.GetContact(ctx, id)
+func (s *Service) GetContact(id string) (*entity.Contact, error) {
+	contact, err := s.Repo.GetContact(id)
 
 	if err != nil {
 		return nil, err
@@ -54,15 +53,15 @@ func (s *Service) GetContact(ctx *gin.Context, id string) (*entity.Contact, erro
 
 	return contact, nil
 }
-func (s *Service) CreateContact(ctx *gin.Context, contact entity.Contact) error {
-	if err := s.Repo.CreateContact(ctx, &contact); err != nil {
+func (s *Service) CreateContact(contact entity.Contact) error {
+	if err := s.Repo.CreateContact(&contact); err != nil {
 		return err
 	}
 
 	return nil
 }
-func (s *Service) UpdateContact(ctx *gin.Context, newContact entity.Contact, id string) error {
-	contact, err := s.Repo.GetContact(ctx, id)
+func (s *Service) UpdateContact(newContact entity.Contact, id string) error {
+	contact, err := s.Repo.GetContact(id)
 	if err != nil {
 		return err
 	}
@@ -89,28 +88,28 @@ func (s *Service) UpdateContact(ctx *gin.Context, newContact entity.Contact, id 
 		contact.CompanyID = 0
 	}
 
-	if err = s.Repo.SaveContact(ctx, contact); err != nil {
+	if err = s.Repo.SaveContact(contact); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (s *Service) DeleteContact(ctx *gin.Context, id string) error {
-	contact, err := s.Repo.GetContact(ctx, id)
+func (s *Service) DeleteContact(id string) error {
+	contact, err := s.Repo.GetContact(id)
 	if err != nil {
 		return err
 	}
 
-	if err = s.Repo.DeleteContact(ctx, id, contact); err != nil {
+	if err = s.Repo.DeleteContact(id, contact); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (s *Service) SearchContact(ctx *gin.Context, query string) (*[]entity.Contact, error) {
-	contacts, err := s.Repo.SearchContact(ctx, query)
+func (s *Service) SearchContact(query string) (*[]entity.Contact, error) {
+	contacts, err := s.Repo.SearchContact(query)
 	if err != nil {
 		return contacts, err
 	}

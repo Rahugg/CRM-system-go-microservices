@@ -24,6 +24,8 @@ func newContactRoutes(handler *gin.RouterGroup, s *service.Service, MW *middlewa
 	{
 		//middleware for users
 		contactHandler.Use(MW.MetricsHandler())
+		contactHandler.Use(MW.DeserializeUser("manager", "admin"))
+
 		contactHandler.GET("/", r.getContacts)
 		contactHandler.GET("/:id", r.getContact)
 		contactHandler.POST("/", r.createContact)
@@ -51,7 +53,7 @@ func (cr *contactRoutes) getContacts(ctx *gin.Context) {
 	sortOrder := ctx.Query("sortOrder")
 	phone := ctx.Query("phone")
 
-	contacts, err := cr.s.GetContacts(ctx, sortBy, sortOrder, phone)
+	contacts, err := cr.s.GetContacts(sortBy, sortOrder, phone)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
@@ -88,7 +90,7 @@ func (cr *contactRoutes) getContact(ctx *gin.Context) {
 	}
 
 	if contact == nil {
-		contact, err = cr.s.GetContact(ctx, id)
+		contact, err = cr.s.GetContact(id)
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
 				Status:  -2,
@@ -132,7 +134,7 @@ func (cr *contactRoutes) createContact(ctx *gin.Context) {
 		return
 	}
 
-	if err := cr.s.CreateContact(ctx, contact); err != nil {
+	if err := cr.s.CreateContact(contact); err != nil {
 		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
 			Status:  -2,
 			Message: err.Error(),
@@ -171,7 +173,7 @@ func (cr *contactRoutes) updateContact(ctx *gin.Context) {
 		return
 	}
 
-	if err := cr.s.UpdateContact(ctx, newContact, id); err != nil {
+	if err := cr.s.UpdateContact(newContact, id); err != nil {
 		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
 			Status:  -2,
 			Message: err.Error(),
@@ -204,7 +206,7 @@ func (cr *contactRoutes) updateContact(ctx *gin.Context) {
 func (cr *contactRoutes) deleteContact(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	if err := cr.s.DeleteContact(ctx, id); err != nil {
+	if err := cr.s.DeleteContact(id); err != nil {
 		ctx.JSON(http.StatusNoContent, &entity.CustomResponse{
 			Status:  -1,
 			Message: err.Error(),
@@ -231,7 +233,7 @@ func (cr *contactRoutes) deleteContact(ctx *gin.Context) {
 // @Router /v1/contact/search [get]
 func (cr *contactRoutes) searchContact(ctx *gin.Context) {
 	query := ctx.Query("searchQuery")
-	contacts, err := cr.s.SearchContact(ctx, query)
+	contacts, err := cr.s.SearchContact(query)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponseWithData{
 			Status:  -1,

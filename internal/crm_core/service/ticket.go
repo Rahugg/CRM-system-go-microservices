@@ -2,12 +2,11 @@ package service
 
 import (
 	"crm_system/internal/crm_core/entity"
-	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
-func (s *Service) GetTickets(ctx *gin.Context, sortBy, sortOrder, status string) (*[]entity.Ticket, error) {
-	tickets, err := s.Repo.GetTickets(ctx)
+func (s *Service) GetTickets(sortBy, sortOrder, status string) (*[]entity.Ticket, error) {
+	tickets, err := s.Repo.GetTickets()
 	if status != "" {
 		tickets, err = s.filterTicketsByStatus(tickets, status)
 	}
@@ -42,8 +41,8 @@ func (s *Service) filterTicketsByStatus(tickets *[]entity.Ticket, status string)
 	return tickets, nil
 }
 
-func (s *Service) GetTicket(ctx *gin.Context, id string) (*entity.Ticket, error) {
-	ticket, err := s.Repo.GetTicket(ctx, id)
+func (s *Service) GetTicket(id string) (*entity.Ticket, error) {
+	ticket, err := s.Repo.GetTicket(id)
 
 	if err != nil {
 		return nil, err
@@ -51,15 +50,15 @@ func (s *Service) GetTicket(ctx *gin.Context, id string) (*entity.Ticket, error)
 
 	return ticket, nil
 }
-func (s *Service) CreateTicket(ctx *gin.Context, ticket entity.Ticket) error {
-	if err := s.Repo.CreateTicket(ctx, &ticket); err != nil {
+func (s *Service) CreateTicket(ticket entity.Ticket) error {
+	if err := s.Repo.CreateTicket(&ticket); err != nil {
 		return err
 	}
 
 	return nil
 }
-func (s *Service) UpdateTicket(ctx *gin.Context, newTicket entity.Ticket, id string) error {
-	ticket, err := s.Repo.GetTicket(ctx, id)
+func (s *Service) UpdateTicket(newTicket entity.Ticket, id string) error {
+	ticket, err := s.Repo.GetTicket(id)
 	if err != nil {
 		return err
 	}
@@ -80,7 +79,7 @@ func (s *Service) UpdateTicket(ctx *gin.Context, newTicket entity.Ticket, id str
 		ticket.AssignedTo = newTicket.AssignedTo
 	}
 
-	if err = s.Repo.SaveTicket(ctx, ticket); err != nil {
+	if err = s.Repo.SaveTicket(ticket); err != nil {
 		return err
 	}
 
@@ -96,20 +95,20 @@ func isValidTicketStatus(status entity.StatusTicket) bool {
 	}
 }
 
-func (s *Service) DeleteTicket(ctx *gin.Context, id string) error {
-	ticket, err := s.Repo.GetTicket(ctx, id)
+func (s *Service) DeleteTicket(id string) error {
+	ticket, err := s.Repo.GetTicket(id)
 	if err != nil {
 		return err
 	}
 
-	if err = s.Repo.DeleteTicket(ctx, id, ticket); err != nil {
+	if err = s.Repo.DeleteTicket(id, ticket); err != nil {
 		return err
 	}
 
 	return nil
 }
-func (s *Service) SearchTicket(ctx *gin.Context, query string) (*[]entity.Ticket, error) {
-	tickets, err := s.Repo.SearchTicket(ctx, query)
+func (s *Service) SearchTicket(query string) (*[]entity.Ticket, error) {
+	tickets, err := s.Repo.SearchTicket(query)
 	if err != nil {
 		return tickets, err
 	}

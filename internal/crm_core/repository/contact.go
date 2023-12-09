@@ -3,10 +3,9 @@ package repository
 import (
 	"crm_system/internal/crm_core/entity"
 	"crm_system/internal/crm_core/metrics"
-	"github.com/gin-gonic/gin"
 )
 
-func (r *CRMSystemRepo) GetContacts(ctx *gin.Context) (*[]entity.Contact, error) {
+func (r *CRMSystemRepo) GetContacts() (*[]entity.Contact, error) {
 	var contacts *[]entity.Contact
 	ok, fail := metrics.DatabaseQueryTime("GetContacts")
 	defer fail()
@@ -19,7 +18,7 @@ func (r *CRMSystemRepo) GetContacts(ctx *gin.Context) (*[]entity.Contact, error)
 
 	return contacts, nil
 }
-func (r *CRMSystemRepo) GetContact(ctx *gin.Context, id string) (*entity.Contact, error) {
+func (r *CRMSystemRepo) GetContact(id string) (*entity.Contact, error) {
 	var contact *entity.Contact
 
 	if err := r.DB.First(&contact, id).Error; err != nil {
@@ -28,28 +27,28 @@ func (r *CRMSystemRepo) GetContact(ctx *gin.Context, id string) (*entity.Contact
 
 	return contact, nil
 }
-func (r *CRMSystemRepo) CreateContact(ctx *gin.Context, contact *entity.Contact) error {
+func (r *CRMSystemRepo) CreateContact(contact *entity.Contact) error {
 	if err := r.DB.Create(&contact).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
-func (r *CRMSystemRepo) SaveContact(ctx *gin.Context, newContact *entity.Contact) error {
+func (r *CRMSystemRepo) SaveContact(newContact *entity.Contact) error {
 	if err := r.DB.Save(&newContact).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
-func (r *CRMSystemRepo) DeleteContact(ctx *gin.Context, id string, contact *entity.Contact) error {
+func (r *CRMSystemRepo) DeleteContact(id string, contact *entity.Contact) error {
 	if err := r.DB.Where("id = ?", id).Delete(contact).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *CRMSystemRepo) SearchContact(ctx *gin.Context, query string) (*[]entity.Contact, error) {
+func (r *CRMSystemRepo) SearchContact(query string) (*[]entity.Contact, error) {
 	var contacts *[]entity.Contact
 
 	if err := r.DB.Where("first_name ILIKE ?", "%"+query+"%").Find(&contacts).Error; err != nil {

@@ -3,10 +3,9 @@ package repository
 import (
 	"crm_system/internal/crm_core/entity"
 	"crm_system/internal/crm_core/metrics"
-	"github.com/gin-gonic/gin"
 )
 
-func (r *CRMSystemRepo) GetCompanies(ctx *gin.Context) (*[]entity.Company, error) {
+func (r *CRMSystemRepo) GetCompanies() (*[]entity.Company, error) {
 	var companies *[]entity.Company
 	ok, fail := metrics.DatabaseQueryTime("GetCompanies")
 	defer fail()
@@ -20,7 +19,7 @@ func (r *CRMSystemRepo) GetCompanies(ctx *gin.Context) (*[]entity.Company, error
 	return companies, nil
 }
 
-func (r *CRMSystemRepo) GetCompany(ctx *gin.Context, id string) (*entity.Company, error) {
+func (r *CRMSystemRepo) GetCompany(id string) (*entity.Company, error) {
 	var company *entity.Company
 
 	if err := r.DB.First(&company, id).Error; err != nil {
@@ -30,7 +29,7 @@ func (r *CRMSystemRepo) GetCompany(ctx *gin.Context, id string) (*entity.Company
 	return company, nil
 }
 
-func (r *CRMSystemRepo) CreateCompany(ctx *gin.Context, company *entity.Company) error {
+func (r *CRMSystemRepo) CreateCompany(company *entity.Company) error {
 	if err := r.DB.Create(&company).Error; err != nil {
 		return err
 	}
@@ -38,7 +37,7 @@ func (r *CRMSystemRepo) CreateCompany(ctx *gin.Context, company *entity.Company)
 	return nil
 }
 
-func (r *CRMSystemRepo) SaveCompany(ctx *gin.Context, newCompany *entity.Company) error {
+func (r *CRMSystemRepo) SaveCompany(newCompany *entity.Company) error {
 	if err := r.DB.Save(&newCompany).Error; err != nil {
 		return err
 	}
@@ -46,13 +45,13 @@ func (r *CRMSystemRepo) SaveCompany(ctx *gin.Context, newCompany *entity.Company
 	return nil
 }
 
-func (r *CRMSystemRepo) DeleteCompany(ctx *gin.Context, id string, company *entity.Company) error {
+func (r *CRMSystemRepo) DeleteCompany(id string, company *entity.Company) error {
 	if err := r.DB.Where("id = ?", id).Delete(company).Error; err != nil {
 		return err
 	}
 	return nil
 }
-func (r *CRMSystemRepo) SearchCompany(ctx *gin.Context, query string) (*[]entity.Company, error) {
+func (r *CRMSystemRepo) SearchCompany(query string) (*[]entity.Company, error) {
 	var companies *[]entity.Company
 
 	if err := r.DB.Where("name ILIKE ?", "%"+query+"%").Find(&companies).Error; err != nil {

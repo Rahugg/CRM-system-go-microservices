@@ -2,47 +2,63 @@ package service
 
 import (
 	"crm_system/internal/crm_core/entity"
-	"github.com/gin-gonic/gin"
 )
 
 type (
 	CompanyService interface {
-		GetCompanies(ctx *gin.Context) (*[]entity.Company, error)
-		GetCompany(ctx *gin.Context, id string) (*entity.Company, error)
-		CreateCompany(ctx *gin.Context, company entity.Company) error
-		UpdateCompany(ctx *gin.Context, newCompany entity.NewCompany, id string) error
-		DeleteCompany(ctx *gin.Context, id string) error
+		GetCompanies(sortBy, sortOrder, phone string) (*[]entity.Company, error)
+		GetCompany(id string) (*entity.Company, error)
+		CreateCompany(company entity.Company) error
+		UpdateCompany(newCompany entity.NewCompany, id string) error
+		DeleteCompany(id string) error
+		SearchCompany(query string) (*[]entity.Company, error)
+		sortCompanies(companies *[]entity.Company, sortBy, sortOrder string) (*[]entity.Company, error)
+		filterCompaniesByPhone(companies *[]entity.Company, phone string) (*[]entity.Company, error)
 	}
 
 	TaskService interface {
-		GetTasks(ctx *gin.Context, dealId string, user entity.User) ([]map[string]interface{}, error)
-		GetTask(ctx *gin.Context, id string) (*entity.Task, error)
-		CreateTask(ctx *gin.Context, task entity.Task) error
-		UpdateTask(ctx *gin.Context, newTask entity.Task, id string) error
-		DeleteTask(ctx *gin.Context, id string) error
+		GetTasks(dealId, sortBy, sortOrder, stateInput string, user *entity.User) ([]map[string]interface{}, error)
+		GetTask(id string) (*entity.Task, error)
+		CreateTask(task *entity.TaskInput) error
+		UpdateTask(newTask entity.TaskEditInput, id string, user *entity.User) error
+		GetChangesOfTask(id string) (*[]entity.TaskChanges, error)
+		DeleteTask(id string) error
+		SearchTask(query string) (*[]entity.Task, error)
+		sortTasks(columns []map[string]interface{}, sortBy, sortOrder, state string) ([]map[string]interface{}, error)
+		filterTasksByStates(columns []map[string]interface{}, state string) (map[string]interface{}, error)
+		Vote(user *entity.User, voteInput *entity.VoteInput) error
 	}
 
 	ContactService interface {
-		GetContacts(ctx *gin.Context) (*[]entity.Contact, error)
-		GetContact(ctx *gin.Context, id string) (*entity.Contact, error)
-		CreateContact(ctx *gin.Context, contact entity.Contact) error
-		UpdateContact(ctx *gin.Context, newContact entity.Contact, id string) error
-		DeleteContact(ctx *gin.Context, id string) error
+		GetContacts(sortBy, sortOrder, phone string) (*[]entity.Contact, error)
+		GetContact(id string) (*entity.Contact, error)
+		CreateContact(contact entity.Contact) error
+		UpdateContact(newContact entity.Contact, id string) error
+		DeleteContact(id string) error
+		SearchContact(query string) (*[]entity.Contact, error)
+		sortContacts(contacts *[]entity.Contact, sortBy, sortOrder string) (*[]entity.Contact, error)
+		filterContactsByPhone(contacts *[]entity.Contact, phone string) (*[]entity.Contact, error)
 	}
 
 	TicketService interface {
-		GetTickets(ctx *gin.Context) (*[]entity.Ticket, error)
-		GetTicket(ctx *gin.Context, id string) (*entity.Ticket, error)
-		CreateTicket(ctx *gin.Context, ticket entity.Ticket) error
-		UpdateTicket(ctx *gin.Context, newTicket entity.Ticket, id string) error
-		DeleteTicket(ctx *gin.Context, id string) error
+		GetTickets(sortBy, sortOrder, status string) (*[]entity.Ticket, error)
+		GetTicket(id string) (*entity.Ticket, error)
+		CreateTicket(ticket entity.Ticket) error
+		UpdateTicket(newTicket entity.Ticket, id string) error
+		DeleteTicket(id string) error
+		SearchTicket(query string) (*[]entity.Ticket, error)
+		sortTickets(tickets *[]entity.Ticket, sortBy, sortOrder string) (*[]entity.Ticket, error)
+		filterTicketsByStatus(tickets *[]entity.Ticket, status string) (*[]entity.Ticket, error)
 	}
 
 	DealService interface {
-		GetDeals(ctx *gin.Context) (*[]entity.Deal, error)
-		GetDeal(ctx *gin.Context, id string) (*entity.Deal, error)
-		CreateDeal(ctx *gin.Context, deal entity.Deal) error
-		UpdateDeal(ctx *gin.Context, newDeal entity.Deal, id string) error
-		DeleteDeal(ctx *gin.Context, id string) error
+		GetDeals(sortBy, sortOrder, status string) (*[]entity.Deal, error)
+		GetDeal(id string) (*entity.Deal, error)
+		CreateDeal(deal entity.Deal) error
+		UpdateDeal(newDeal entity.Deal, id string) error
+		DeleteDeal(id string) error
+		SearchDeal(query string) (*[]entity.Deal, error)
+		sortDeals(deals *[]entity.Deal, sortBy, sortOrder string) (*[]entity.Deal, error)
+		filterDealsByStatus(deals *[]entity.Deal, status string) (*[]entity.Deal, error)
 	}
 )

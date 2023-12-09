@@ -19,7 +19,7 @@ func newCompanyRoutes(handler *gin.RouterGroup, s *service.Service, MW *middlewa
 	companyHandler := handler.Group("/company")
 	{
 		//middleware for users
-		companyHandler.Use(MW.DeserializeUser("any"))
+		companyHandler.Use(MW.DeserializeUser("admin", "manager"))
 		companyHandler.Use(MW.MetricsHandler())
 
 		companyHandler.GET("/", r.getCompanies)
@@ -49,7 +49,7 @@ func (cr *companyRoutes) getCompanies(ctx *gin.Context) {
 	sortOrder := ctx.Query("sortOrder")
 	phone := ctx.Query("phone")
 
-	companies, err := cr.s.GetCompanies(ctx, sortBy, sortOrder, phone)
+	companies, err := cr.s.GetCompanies(sortBy, sortOrder, phone)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
@@ -80,7 +80,7 @@ func (cr *companyRoutes) getCompanies(ctx *gin.Context) {
 func (cr *companyRoutes) getCompany(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	company, err := cr.s.GetCompany(ctx, id)
+	company, err := cr.s.GetCompany(id)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponse{
@@ -119,7 +119,7 @@ func (cr *companyRoutes) createCompany(ctx *gin.Context) {
 		return
 	}
 
-	if err := cr.s.CreateCompany(ctx, company); err != nil {
+	if err := cr.s.CreateCompany(company); err != nil {
 		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
 			Status:  -2,
 			Message: err.Error(),
@@ -158,7 +158,7 @@ func (cr *companyRoutes) updateCompany(ctx *gin.Context) {
 		return
 	}
 
-	if err := cr.s.UpdateCompany(ctx, newCompany, id); err != nil {
+	if err := cr.s.UpdateCompany(newCompany, id); err != nil {
 		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
 			Status:  -2,
 			Message: err.Error(),
@@ -186,7 +186,7 @@ func (cr *companyRoutes) updateCompany(ctx *gin.Context) {
 func (cr *companyRoutes) deleteCompany(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	if err := cr.s.DeleteCompany(ctx, id); err != nil {
+	if err := cr.s.DeleteCompany(id); err != nil {
 		ctx.JSON(http.StatusNoContent, &entity.CustomResponse{
 			Status:  -1,
 			Message: err.Error(),
@@ -213,7 +213,7 @@ func (cr *companyRoutes) deleteCompany(ctx *gin.Context) {
 // @Router /v1/company/search [get]
 func (cr *companyRoutes) searchCompany(ctx *gin.Context) {
 	query := ctx.Query("searchQuery")
-	companies, err := cr.s.SearchCompany(ctx, query)
+	companies, err := cr.s.SearchCompany(query)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponseWithData{
 			Status:  -1,

@@ -4,11 +4,10 @@ import (
 	"crm_system/internal/crm_core/entity"
 	"crm_system/internal/crm_core/metrics"
 	"errors"
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-func (r *CRMSystemRepo) GetTasks(ctx *gin.Context) (*[]entity.Task, error) {
+func (r *CRMSystemRepo) GetTasks() (*[]entity.Task, error) {
 	var tasks *[]entity.Task
 
 	ok, fail := metrics.DatabaseQueryTime("GetTasks")
@@ -23,7 +22,7 @@ func (r *CRMSystemRepo) GetTasks(ctx *gin.Context) (*[]entity.Task, error) {
 	return tasks, nil
 }
 
-func (r *CRMSystemRepo) GetTask(ctx *gin.Context, id string) (*entity.Task, error) {
+func (r *CRMSystemRepo) GetTask(id string) (*entity.Task, error) {
 	var task *entity.Task
 
 	if err := r.DB.First(&task, id).Error; err != nil {
@@ -39,14 +38,14 @@ func (r *CRMSystemRepo) GetTasksByDealId(dealId string) ([]entity.Task, error) {
 	}
 	return tasks, nil
 }
-func (r *CRMSystemRepo) CreateTaskChanges(ctx *gin.Context, taskChanges *entity.TaskChanges) error {
+func (r *CRMSystemRepo) CreateTaskChanges(taskChanges *entity.TaskChanges) error {
 	if err := r.DB.Create(&taskChanges).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *CRMSystemRepo) CreateTask(ctx *gin.Context, newTask *entity.TaskInput) error {
+func (r *CRMSystemRepo) CreateTask(newTask *entity.TaskInput) error {
 	task := &entity.Task{
 		Model:            gorm.Model{},
 		Name:             newTask.Name,
@@ -81,7 +80,7 @@ func (r *CRMSystemRepo) GetChangesOfTask(id string) (*[]entity.TaskChanges, erro
 	return &taskChanges, nil
 }
 
-func (r *CRMSystemRepo) SaveTask(ctx *gin.Context, newTask *entity.Task) error {
+func (r *CRMSystemRepo) SaveTask(newTask *entity.Task) error {
 	if err := r.DB.Save(&newTask).Error; err != nil {
 		return err
 	}
@@ -89,13 +88,13 @@ func (r *CRMSystemRepo) SaveTask(ctx *gin.Context, newTask *entity.Task) error {
 	return nil
 }
 
-func (r *CRMSystemRepo) DeleteTask(ctx *gin.Context, id string, task *entity.Task) error {
+func (r *CRMSystemRepo) DeleteTask(id string, task *entity.Task) error {
 	if err := r.DB.Where("id = ?", id).Delete(task).Error; err != nil {
 		return err
 	}
 	return nil
 }
-func (r *CRMSystemRepo) SearchTask(ctx *gin.Context, query string) (*[]entity.Task, error) {
+func (r *CRMSystemRepo) SearchTask(query string) (*[]entity.Task, error) {
 	var tasks *[]entity.Task
 
 	if err := r.DB.Where("name ILIKE ?", "%"+query+"%").Find(&tasks).Error; err != nil {
