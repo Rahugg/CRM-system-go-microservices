@@ -34,19 +34,25 @@ func (m *Middleware) CustomLogger() gin.HandlerFunc {
 	}
 }
 
+func validBearer(ctx *gin.Context) string {
+	var accessToken string
+
+	cookie, err := ctx.Cookie("access_token")
+	authorizationHeader := ctx.Request.Header.Get("Authorization")
+	fields := strings.Fields(authorizationHeader)
+
+	if len(fields) != 0 && fields[0] == "Bearer" {
+		accessToken = fields[1]
+	} else if err == nil {
+		accessToken = cookie
+	}
+
+	return accessToken
+}
+
 func (m *Middleware) DeserializeUser(roles ...interface{}) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var accessToken string
-
-		cookie, err := ctx.Cookie("access_token")
-		authorizationHeader := ctx.Request.Header.Get("Authorization")
-		fields := strings.Fields(authorizationHeader)
-
-		if len(fields) != 0 && fields[0] == "Bearer" {
-			accessToken = fields[1]
-		} else if err == nil {
-			accessToken = cookie
-		}
+		accessToken := validBearer(ctx)
 
 		if accessToken == "" {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, &entity.CustomResponse{
@@ -75,6 +81,7 @@ func (m *Middleware) DeserializeUser(roles ...interface{}) gin.HandlerFunc {
 		}
 
 		role, _ := m.Repo.GetRoleById(user.RoleID)
+
 		for _, Role := range roles {
 			if role.Name == Role || Role == "any" {
 				ctx.Set("currentUser", user)
@@ -88,6 +95,5 @@ func (m *Middleware) DeserializeUser(roles ...interface{}) gin.HandlerFunc {
 			Status:  -4,
 			Message: "User must have roles: " + fmt.Sprintf("%v", roles),
 		})
-
 	}
 }

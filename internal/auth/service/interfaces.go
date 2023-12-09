@@ -7,14 +7,19 @@ import (
 
 type (
 	AuthService interface {
-		SignUp(ctx *gin.Context, payload *entity.SignUpInput, roleId uint, verified bool, provider string) (interface{}, error)
+		SignUp(payload *entity.SignUpInput, roleId uint, provider string) (string, error)
 		SignIn(payload *entity.SignInInput) (*entity.SignInResult, error)
 	}
 	UserService interface {
-		GetUsers(ctx *gin.Context) (*[]entity.User, error)
-		GetUser(ctx *gin.Context, id string) (*entity.User, error)
-		CreateUser(ctx *gin.Context, user entity.User) error
-		UpdateUser(ctx *gin.Context, newUser entity.User, id string) error
-		DeleteUser(ctx *gin.Context, id string) error
+		GetUsers(sortBy, sortOrder, age string) (*[]entity.User, error)
+		GetUser(id string) (*entity.User, error)
+		CreateUser(user *entity.User) error
+		UpdateUser(newUser *entity.User, id string) error
+		DeleteUser(id string) error
+		GetMe(ctx *gin.Context) (interface{}, error)
+		UpdateMe(ctx *gin.Context, newUser *entity.User) error
+		SearchUser(query string) (*[]entity.User, error)
+		CreateUserCode(id string) error
+		ConfirmUser(code string) error
 	}
 )

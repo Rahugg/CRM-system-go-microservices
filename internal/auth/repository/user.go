@@ -4,7 +4,6 @@ import (
 	"crm_system/internal/auth/entity"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"strings"
 )
 
@@ -23,7 +22,7 @@ func (r *AuthRepo) GetUser(id string) (*entity.User, error) {
 	return user, nil
 }
 
-func (r *AuthRepo) GetUserByEmail(ctx *gin.Context, email string) (*entity.User, error) {
+func (r *AuthRepo) GetUserByEmail(email string) (*entity.User, error) {
 	var user entity.User
 	if err := r.DB.Preload("Role").Where("email = ?", strings.ToLower(email)).First(&user).Error; err != nil {
 		return nil, err
@@ -31,7 +30,7 @@ func (r *AuthRepo) GetUserByEmail(ctx *gin.Context, email string) (*entity.User,
 	return &user, nil
 }
 
-func (r *AuthRepo) GetUsersByRole(ctx *gin.Context, roleId uint) (*[]entity.User, error) {
+func (r *AuthRepo) GetUsersByRole(roleId uint) (*[]entity.User, error) {
 	var users []entity.User
 	if err := r.DB.Preload("Role").Where("role_id = ? ", roleId).Find(&users).Error; err != nil {
 		return nil, err
@@ -39,7 +38,7 @@ func (r *AuthRepo) GetUsersByRole(ctx *gin.Context, roleId uint) (*[]entity.User
 	return &users, nil
 }
 
-func (r *AuthRepo) CreateUser(ctx *gin.Context, user *entity.User) error {
+func (r *AuthRepo) CreateUser(user *entity.User) error {
 	err := r.DB.Create(user).Error
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique") {
@@ -58,16 +57,6 @@ func (r *AuthRepo) SaveUser(user *entity.User) error {
 	return nil
 }
 
-func (r *AuthRepo) GetUsers(ctx *gin.Context) (*[]entity.User, error) {
-	var users *[]entity.User
-
-	if err := r.DB.Find(&users).Error; err != nil {
-		return nil, err
-	}
-
-	return users, nil
-}
-
 func (r *AuthRepo) GetAllUsers() (*[]entity.User, error) {
 	var users *[]entity.User
 
@@ -78,14 +67,14 @@ func (r *AuthRepo) GetAllUsers() (*[]entity.User, error) {
 	return users, nil
 }
 
-func (r *AuthRepo) DeleteUser(ctx *gin.Context, id string, user *entity.User) error {
+func (r *AuthRepo) DeleteUser(id string, user *entity.User) error {
 	if err := r.DB.Where("id = ?", id).Delete(user).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *AuthRepo) SearchUser(ctx *gin.Context, query string) (*[]entity.User, error) {
+func (r *AuthRepo) SearchUser(query string) (*[]entity.User, error) {
 	var users *[]entity.User
 
 	if err := r.DB.Where("first_name ILIKE ?", "%"+query+"%").Find(&users).Error; err != nil {

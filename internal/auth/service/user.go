@@ -12,7 +12,20 @@ import (
 	"strings"
 )
 
-func (s *Service) SignUp(ctx *gin.Context, payload *entity2.SignUpInput, roleId uint, provider string) (string, error) {
+func getUser(payload *entity2.SignUpInput, hashedPassword, provider string, roleId uint) entity2.User {
+	userBuilder := entity2.NewUser()
+	user := userBuilder.
+		SetFirstName(payload.FirstName).
+		SetLastName(payload.LastName).
+		SetEmail(strings.ToLower(payload.Email)).
+		SetPassword(hashedPassword).
+		SetRoleID(roleId).
+		SetProvider(provider).
+		Build()
+	return user
+}
+
+func (s *Service) SignUp(payload *entity2.SignUpInput, roleId uint, provider string) (string, error) {
 	if !utils.IsValidEmail(payload.Email) {
 		return "", errors.New("email validation error")
 	}
@@ -30,20 +43,13 @@ func (s *Service) SignUp(ctx *gin.Context, payload *entity2.SignUpInput, roleId 
 		return "", err
 	}
 
-	user := entity2.User{
-		FirstName:   payload.FirstName,
-		LastName:    payload.LastName,
-		Email:       strings.ToLower(payload.Email),
-		Password:    hashedPassword,
-		RoleID:      roleId,
-		Provider:    provider,
-		IsConfirmed: false,
-	}
+	user := getUser(payload, hashedPassword, provider, roleId)
 
-	if err = s.Repo.CreateUser(ctx, &user); err != nil {
+	if err = s.Repo.CreateUser(&user); err != nil {
 		return "", err
 	}
-	userResponse, err := s.Repo.GetUserByEmail(ctx, user.Email)
+
+	userResponse, err := s.Repo.GetUserByEmail(user.Email)
 	if err != nil {
 		return "", err
 	}
@@ -51,8 +57,8 @@ func (s *Service) SignUp(ctx *gin.Context, payload *entity2.SignUpInput, roleId 
 	return userResponse.ID.String(), nil
 }
 
-func (s *Service) SignIn(ctx *gin.Context, payload *entity2.SignInInput) (*entity2.SignInResult, error) {
-	user, err := s.Repo.GetUserByEmail(ctx, payload.Email)
+func (s *Service) SignIn(payload *entity2.SignInInput) (*entity2.SignInResult, error) {
+	user, err := s.Repo.GetUserByEmail(payload.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -114,9 +120,11 @@ func (s *Service) sortUsers(users *[]entity2.User, sortBy, sortOrder string) (*[
 }
 func (s *Service) filterUsersByAge(users *[]entity2.User, age string) (*[]entity2.User, error) {
 	users, err := s.Repo.FilterUsersByAge(users, age)
+
 	if err != nil {
 		return nil, err
 	}
+
 	return users, nil
 }
 
@@ -129,8 +137,8 @@ func (s *Service) GetUser(id string) (*entity2.User, error) {
 
 	return user, nil
 }
-func (s *Service) CreateUser(ctx *gin.Context, user *entity2.User) error {
-	if err := s.Repo.CreateUser(ctx, user); err != nil {
+func (s *Service) CreateUser(user *entity2.User) error {
+	if err := s.Repo.CreateUser(user); err != nil {
 		return err
 	}
 
@@ -181,13 +189,13 @@ func (s *Service) UpdateUser(newUser *entity2.User, id string) error {
 	return nil
 }
 
-func (s *Service) DeleteUser(ctx *gin.Context, id string) error {
+func (s *Service) DeleteUser(id string) error {
 	user, err := s.Repo.GetUser(id)
 	if err != nil {
 		return err
 	}
 
-	if err = s.Repo.DeleteUser(ctx, id, user); err != nil {
+	if err = s.Repo.DeleteUser(id, user); err != nil {
 		return err
 	}
 
@@ -245,8 +253,8 @@ func (s *Service) UpdateMe(ctx *gin.Context, newUser *entity2.User) error {
 	return nil
 }
 
-func (s *Service) SearchUser(ctx *gin.Context, query string) (*[]entity2.User, error) {
-	users, err := s.Repo.SearchUser(ctx, query)
+func (s *Service) SearchUser(query string) (*[]entity2.User, error) {
+	users, err := s.Repo.SearchUser(query)
 	if err != nil {
 		return users, err
 	}

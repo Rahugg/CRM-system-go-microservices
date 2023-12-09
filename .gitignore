@@ -10,5 +10,5 @@ vendor
 docker/data
 docker
 
-data/kafka1
-data/zookeeper
+data/kafka1/
+data/zookeeper/

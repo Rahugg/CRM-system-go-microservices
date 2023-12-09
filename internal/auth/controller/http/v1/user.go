@@ -40,7 +40,6 @@ func newUserRoutes(handler *gin.RouterGroup, s *service.Service, MW *middleware.
 		userHandler.POST("/register", r.signUpManager)
 		userHandler.POST("/confirm", r.confirmUser)
 		userHandler.POST("/login", r.signIn)
-		userHandler.GET("/logout", r.logout)
 		userHandler.POST("/register/sales", MW.DeserializeUser("manager"), r.signUpSalesRep)
 		userHandler.POST("/register/support", MW.DeserializeUser("manager"), r.signUpSupportRep)
 
@@ -90,7 +89,7 @@ func (ur *userRoutes) signUp(ctx *gin.Context, roleId uint, provider string) {
 		return
 	}
 
-	id, err := ur.s.SignUp(ctx, &payload, roleId, provider)
+	id, err := ur.s.SignUp(&payload, roleId, provider)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, &entity.CustomResponse{
 			Status:  -2,
@@ -103,6 +102,7 @@ func (ur *userRoutes) signUp(ctx *gin.Context, roleId uint, provider string) {
 	wg.Add(1)
 	go ur.createUserCode(ctx, id, &wg)
 	wg.Wait()
+
 	ctx.JSON(http.StatusOK, &entity.CustomResponse{
 		Status:  0,
 		Message: "go confirm yourself",
@@ -129,7 +129,7 @@ func (ur *userRoutes) signIn(ctx *gin.Context) {
 		return
 	}
 
-	data, err := ur.s.SignIn(ctx, payload)
+	data, err := ur.s.SignIn(payload)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, &entity.CustomResponse{
 			Status:  -2,
@@ -137,17 +137,11 @@ func (ur *userRoutes) signIn(ctx *gin.Context) {
 		})
 		return
 	}
+
 	ctx.JSON(http.StatusOK, &entity.CustomResponseWithData{
 		Status:  0,
 		Message: "OK",
 		Data:    data,
-	})
-}
-
-func (ur *userRoutes) logout(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, &entity.CustomResponse{
-		Status:  0,
-		Message: "OK",
 	})
 }
 
@@ -270,7 +264,7 @@ func (ur *userRoutes) updateUser(ctx *gin.Context) {
 func (ur *userRoutes) deleteUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	if err := ur.s.DeleteUser(ctx, id); err != nil {
+	if err := ur.s.DeleteUser(id); err != nil {
 		ctx.JSON(http.StatusNoContent, &entity.CustomResponse{
 			Status:  -1,
 			Message: err.Error(),
@@ -291,12 +285,11 @@ func (ur *userRoutes) deleteUser(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param body body entity.User true "Create User"
+// @Param inputUser body entity.User true "Create User"
 // @Success 200 {object} entity.CustomResponse
 // @Failure 400 {object} entity.CustomResponse
 // @Router /v1/admin/user/ [post]
 func (ur *userRoutes) createUser(ctx *gin.Context) {
-
 	var user *entity.User
 
 	if err := ctx.ShouldBindJSON(&user); err != nil {
@@ -307,7 +300,7 @@ func (ur *userRoutes) createUser(ctx *gin.Context) {
 		return
 	}
 
-	if err := ur.s.CreateUser(ctx, user); err != nil {
+	if err := ur.s.CreateUser(user); err != nil {
 		ctx.JSON(http.StatusInternalServerError, &entity.CustomResponse{
 			Status:  -2,
 			Message: err.Error(),
@@ -375,6 +368,7 @@ func (ur *userRoutes) updateMe(ctx *gin.Context) {
 			Status:  -2,
 			Message: err.Error(),
 		})
+		return
 	}
 
 	ctx.JSON(http.StatusOK, &entity.CustomResponse{
@@ -396,7 +390,7 @@ func (ur *userRoutes) updateMe(ctx *gin.Context) {
 // @Router /v1/admin/user/search [get]
 func (ur *userRoutes) searchUser(ctx *gin.Context) {
 	query := ctx.Query("searchQuery")
-	users, err := ur.s.SearchUser(ctx, query)
+	users, err := ur.s.SearchUser(query)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &entity.CustomResponseWithData{
 			Status:  -1,

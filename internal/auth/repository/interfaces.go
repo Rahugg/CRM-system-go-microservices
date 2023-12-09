@@ -2,21 +2,27 @@ package repository
 
 import (
 	"crm_system/internal/auth/entity"
-	"github.com/gin-gonic/gin"
 )
 
 type (
 	AuthRepository interface {
-		GetUserByIdWithPreload(ctx *gin.Context, id string) (*entity.User, error)
-		GetUser(ctx *gin.Context, id string) (*entity.User, error)
-		GetUserByEmail(ctx *gin.Context, email string) (*entity.User, error)
-		GetUsersByRole(ctx *gin.Context, roleId uint) (*[]entity.User, error)
-		CreateUser(ctx *gin.Context, user *entity.User) error
-		GetRoleById(ctx *gin.Context, id uint) (*entity.Role, error)
-		SaveUser(ctx *gin.Context, user *entity.User) error
+		CreateUserCode(id string, code string) error
+		ConfirmUser(code string) error
 	}
 	UserRepository interface {
-		GetUsers(ctx *gin.Context) (*[]entity.User, error)
-		DeleteDeal(ctx *gin.Context, id string, deal *entity.User) error
+		CreateUser(user *entity.User) error
+		SaveUser(user *entity.User) error
+		SortUsers(users *[]entity.User, sortBy, sortOrder string) (*[]entity.User, error)
+		GetUserByIdWithPreload(id string) (*entity.User, error)
+		GetUser(id string) (*entity.User, error)
+		GetAllUsers() (*[]entity.User, error)
+		GetUserByEmail(email string) (*entity.User, error)
+		GetUsersByRole(roleId uint) (*[]entity.User, error)
+		DeleteUser(id string, user *entity.User) error
+		SearchUser(query string) (*[]entity.User, error)
+		FilterUsersByAge(users *[]entity.User, age string) (*[]entity.User, error)
+	}
+	RoleRepository interface {
+		GetRoleById(id uint) (*entity.Role, error)
 	}
 )
