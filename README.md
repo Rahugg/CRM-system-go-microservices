@@ -32,7 +32,7 @@
       <ul>
         <li><a href="#built-with">Built With</a></li>
         <li><a href="#tech-features">Tech features</a></li>
-        <li><a href="folder-structure">Folder Structure</a></li>
+        <li><a href="#folder-structure">Folder Structure</a></li>
       </ul>
     </li>
      <li>
