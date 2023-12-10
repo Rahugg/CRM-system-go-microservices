@@ -32,6 +32,7 @@
       <ul>
         <li><a href="#built-with">Built With</a></li>
         <li><a href="#tech-features">Tech features</a></li>
+        <li><a href="folder-structure">Folder Structure</a></li>
       </ul>
     </li>
      <li>
@@ -104,6 +105,71 @@ Customer Relationship Management
 * RESTful APIs
 * Swagger
 * Viper Config
+
+## Folder Structure
+
+## Internal
+
+### `app`
+Main application logic and resource management.
+
+### `controller`
+HTTP and/or gRPC controllers for request handling.
+
+### `docs`
+Internal documentation.
+
+### `entity`
+Data structures representing domain entities.
+
+### `repository`
+Data access methods for persistence and retrieval.
+
+### `service`
+Encapsulated business logic.
+
+### `storage`
+Interaction with specific data storage systems.
+
+## Cmd
+
+### `auth`
+Entry point for the authentication service.
+
+### `crm_core`
+Entry point for the core CRM service.
+
+## Config
+
+### `auth`
+Configuration specific to the authentication service.
+
+### `crm_core`
+Configuration specific to the core CRM service.
+
+## Data
+
+### `kafka1`
+Data for the Kafka service (topics, messages).
+
+### `zookeeper`
+Configuration files and state information for Zookeeper.
+
+## Migrations
+
+### `auth`
+Database schema migration scripts for the authentication service.
+
+### `crm_core`
+Database schema migration scripts for the core CRM service.
+
+## Pkg
+
+### `auth`
+Reusable functions and utilities specific to the authentication service.
+
+### `crm_core`
+Reusable functions and utilities specific to the core CRM service.
   
 ## Reasons why I used these technologies 
 <summary>Technologies</summary>
